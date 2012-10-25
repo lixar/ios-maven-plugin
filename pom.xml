@@ -3,7 +3,7 @@
 	<groupId>com.brewinapps</groupId>
 	<artifactId>ios-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>1.2.0-BETA</version>
+	<version>1.2.1-BETA-SNAPSHOT</version>
 
 	<name>iOS Maven Plugin</name>
 	<url>https://github.com/brewinapps/ios-maven-plugin</url>
