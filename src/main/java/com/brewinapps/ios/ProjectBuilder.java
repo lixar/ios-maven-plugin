@@ -45,6 +45,14 @@ public class ProjectBuilder {
 			pb.directory(workDir);
 			CommandHelper.performCommand(pb);
 		}
+		else if (properties.get("incrementBuildNumber") != null) {
+			pb = new ProcessBuilder(
+					"agvtool",
+					"next-version",
+					"-all");
+			pb.directory(workDir);
+			CommandHelper.performCommand(pb);
+		}
 		
 		// Build the application
 		List<String> buildParameters = new ArrayList<String>();

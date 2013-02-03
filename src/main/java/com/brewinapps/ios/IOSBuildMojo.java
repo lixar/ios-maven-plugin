@@ -91,8 +91,15 @@ public class IOSBuildMojo extends AbstractMojo {
 	 * 		expression="${ios.buildId}" 
 	 * 		default-value="${project.version}"
 	 */
-	private String buildId;	
-		
+	private String buildId;
+
+	/**
+	 * If the build number should be incremented
+	 * @parameter
+	 * 		expression="${ios.incrementBuildNumber}" 
+	 */
+	private boolean incrementBuildNumber;
+	
 	/**
 	* The maven project.
 	* 
@@ -125,6 +132,7 @@ public class IOSBuildMojo extends AbstractMojo {
 			properties.put("configuration", configuration);
 			properties.put("buildId", buildId);
 			properties.put("version", version);
+			properties.put("incrementBuildNumber", incrementBuildNumber ? "1" : null);
 			properties.put("scheme", scheme);
 			
 			ProjectBuilder.build(properties);
