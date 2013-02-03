@@ -32,6 +32,8 @@ public class ProjectDeployer {
 	throws IOSException {
 		
 		System.out.println("Deploying to HockeyApp...");
+		validateProperties(properties);
+		
 		try {
 			File appPath = new File(properties.get("targetDir")
 					+ "/" + properties.get("configuration") + "-iphoneos/");
@@ -84,5 +86,14 @@ public class ProjectDeployer {
 		} catch (Exception e) {
 			throw new IOSException("An error occured while deploying build to HockeyApp: " + e.getMessage());
 		}
-	}	
+	}
+
+	protected static void validateProperties(final Map<String, String> properties) throws IOSException {
+		if (properties.get("hockeyAppToken") == null) {
+			throw new IOSException("The 'hockeyAppToken' parameter is required to upload to Hockey App");
+		}
+		if (properties.get("hockeyAppIdentifier") == null) {
+			throw new IOSException("The 'hockeyAppIdentifier' parameter is required to upload to Hockey App");
+		}
+	}
 }
