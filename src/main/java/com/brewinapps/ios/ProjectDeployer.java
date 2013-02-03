@@ -49,7 +49,9 @@ public class ProjectDeployer {
 			HttpClient client = new DefaultHttpClient();
 			client.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 			
-			HttpPost post = new HttpPost("https://rink.hockeyapp.net/api/2/apps");
+			String hockeyAppUrl = "https://rink.hockeyapp.net/api/2/apps/" + properties.get("hockeyAppIdentifier") + "/app_versions";
+			HttpPost post = new HttpPost(hockeyAppUrl);
+			
 			MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 			
 			// Set headers and parameters
@@ -60,9 +62,13 @@ public class ProjectDeployer {
 			entity.addPart("dsym", new FileBody(
 					new File(appPath + "/" + properties.get("appName") + ".dSYM.zip"), 
 					"application/zip"));
-			entity.addPart("notes", 
-					new StringBody(properties.get("releaseNotes"), 
-							"text/plain", Charset.forName("UTF-8")));
+			
+			if (properties.get("releaseNotes") != null) {
+				entity.addPart("notes", 
+						new StringBody(properties.get("releaseNotes"), 
+								"text/plain", Charset.forName("UTF-8")));
+			}
+			
 			post.setEntity(entity);
 			
 			// Run the request

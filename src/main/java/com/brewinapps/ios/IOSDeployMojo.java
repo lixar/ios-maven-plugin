@@ -23,7 +23,14 @@ public class IOSDeployMojo extends AbstractMojo {
 	 * 		expression="${ios.hockeyAppToken}"
 	 */
 	private String hockeyAppToken;
-			
+
+	/**
+	 * HockeyApp Application Identifier
+	 * @parameter
+	 * 		expression="${ios.hockeyAppIdentifier}"
+	 */
+	private String hockeyAppIdentifier;
+	
 	/**
 	 * TestFlight Release Notes
 	 * @parameter
@@ -47,7 +54,7 @@ public class IOSDeployMojo extends AbstractMojo {
 	 * 		default-value="Release"
 	 */
 	private String configuration;	
-		
+	
 	/**
 	* The maven project.
 	* 
@@ -69,6 +76,7 @@ public class IOSDeployMojo extends AbstractMojo {
 			Map<String, String> properties = new HashMap<String, String>();
 			properties.put("appName", appName);
 			properties.put("hockeyAppToken", hockeyAppToken);
+			properties.put("hockeyAppIdentifier", hockeyAppIdentifier);
 			properties.put("releaseNotes", releaseNotes);
 			properties.put("appDir", appDir);
 			properties.put("configuration", configuration);
