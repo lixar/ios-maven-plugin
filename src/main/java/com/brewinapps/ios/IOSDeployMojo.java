@@ -64,7 +64,7 @@ public class IOSDeployMojo extends AbstractMojo {
 		try {
 			final String targetDir = project.getBuild().getDirectory();
 			final String appDir = project.getBasedir().getAbsoluteFile() + 
-					"/" + targetDir + "/" + configuration + "-iphoneos/";			
+					"/" + targetDir + "/" + configuration + "-iphoneos/";
 			
 			Map<String, String> properties = new HashMap<String, String>();
 			properties.put("appName", appName);

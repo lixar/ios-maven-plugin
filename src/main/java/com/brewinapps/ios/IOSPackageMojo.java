@@ -46,8 +46,8 @@ public class IOSPackageMojo extends AbstractMojo {
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			final String targetDir = project.getBuild().getDirectory();			
-			final String appDir = targetDir + "/" + configuration + "-iphoneos/";			
+			final String targetDir = project.getBuild().getDirectory();
+			final String appDir = targetDir + "/" + configuration + "-iphoneos/";
 			final String artifactName = appName + ".zip";
 			
 			ProcessBuilder pb = new ProcessBuilder(

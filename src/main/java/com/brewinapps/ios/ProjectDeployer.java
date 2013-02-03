@@ -31,7 +31,7 @@ public class ProjectDeployer {
 	public static void deploy(final Map<String, String> properties) 
 	throws IOSException {
 		
-		System.out.println("Deploying to HockeyApp...");		
+		System.out.println("Deploying to HockeyApp...");
 		try {
 			File appPath = new File(properties.get("targetDir")
 					+ "/" + properties.get("configuration") + "-iphoneos/");
@@ -43,7 +43,7 @@ public class ProjectDeployer {
 					properties.get("appName") + ".dSYM.zip", 
 					properties.get("appName") + ".app.dSYM");
 			pb.directory(appPath);
-			CommandHelper.performCommand(pb);					
+			CommandHelper.performCommand(pb);
 			
 			// Prepare HTTP request
 			HttpClient client = new DefaultHttpClient();
@@ -59,12 +59,12 @@ public class ProjectDeployer {
 							"application/zip"));
 			entity.addPart("dsym", new FileBody(
 					new File(appPath + "/" + properties.get("appName") + ".dSYM.zip"), 
-					"application/zip"));			
+					"application/zip"));
 			entity.addPart("notes", 
 					new StringBody(properties.get("releaseNotes"), 
-							"text/plain", Charset.forName("UTF-8")));			
+							"text/plain", Charset.forName("UTF-8")));
 			post.setEntity(entity);
-									
+			
 			// Run the request
 			HttpResponse response = client.execute(post);
 			HttpEntity responseEntity = response.getEntity();

@@ -33,7 +33,7 @@ public class ProjectBuilder {
 				"new-marketing-version",
 				properties.get("version"));
 		pb.directory(workDir);
-		CommandHelper.performCommand(pb);			
+		CommandHelper.performCommand(pb);
 		
 		// Run agvtool to stamp build if a build id is specified
 		if (properties.get("buildId") != null) {
@@ -43,7 +43,7 @@ public class ProjectBuilder {
 					"-all",
 					properties.get("buildId"));
 			pb.directory(workDir);
-			CommandHelper.performCommand(pb);			
+			CommandHelper.performCommand(pb);
 		}
 		
 		// Build the application

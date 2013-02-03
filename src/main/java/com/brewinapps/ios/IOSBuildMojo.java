@@ -52,7 +52,7 @@ public class IOSBuildMojo extends AbstractMojo {
 	 * @parameter
 	 * 		expression="${ios.scheme}"
 	 */
-	private String scheme;		
+	private String scheme;
 	
 	/**
 	 * iOS SDK
