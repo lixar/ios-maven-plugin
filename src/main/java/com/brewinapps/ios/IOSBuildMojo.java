@@ -109,6 +109,10 @@ public class IOSBuildMojo extends AbstractMojo {
 		try {
 			final String targetDir = project.getBuild().getDirectory();
 			
+			if (null == version) {
+				version = project.getVersion();
+			}
+			
 			Map<String, String> properties = new HashMap<String, String>();
 			properties.put("appName", appName);
 			properties.put("workspaceName", workspaceName);
