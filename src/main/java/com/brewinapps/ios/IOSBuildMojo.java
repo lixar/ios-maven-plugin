@@ -34,6 +34,20 @@ public class IOSBuildMojo extends AbstractMojo {
 	private String appName;
 	
 	/**
+	 * iOS workspace name
+	 * @parameter
+	 * 		expression="${ios.workspaceName}"
+	 */
+	private String workspaceName;
+
+	/**
+	 * iOS project name
+	 * @parameter
+	 * 		expression="${ios.projectName}"
+	 */
+	private String projectName;
+	
+	/**
 	 * iOS scheme
 	 * @parameter
 	 * 		expression="${ios.scheme}"
@@ -97,6 +111,8 @@ public class IOSBuildMojo extends AbstractMojo {
 			
 			Map<String, String> properties = new HashMap<String, String>();
 			properties.put("appName", appName);
+			properties.put("workspaceName", workspaceName);
+			properties.put("projectName", projectName);
 			properties.put("codeSignIdentity", codeSignIdentity);
 			properties.put("sdk", sdk);
 			properties.put("baseDir", project.getBasedir().toString());
