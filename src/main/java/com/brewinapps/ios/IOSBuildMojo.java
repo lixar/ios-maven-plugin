@@ -1,9 +1,10 @@
 package com.brewinapps.ios;
 
-import java.util.HashMap;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -15,7 +16,7 @@ import org.apache.maven.project.MavenProject;
  * @goal build
  * @phase compile
  */
-public class IOSBuildMojo extends AbstractMojo {
+public class IOSBuildMojo extends IOSAbstractMojo {
 	
 	/**
 	 * iOS Source Directory
@@ -34,62 +35,29 @@ public class IOSBuildMojo extends AbstractMojo {
 	private String appName;
 	
 	/**
-	 * iOS workspace name
+	 * iOS build parameters
 	 * @parameter
-	 * 		expression="${ios.workspaceName}"
 	 */
-	private String workspaceName;
-
-	/**
-	 * iOS project name
-	 * @parameter
-	 * 		expression="${ios.projectName}"
-	 */
-	private String projectName;
+	private Map<String, String> buildParams;
 	
 	/**
-	 * iOS scheme
+	 * Keychain parameters
 	 * @parameter
-	 * 		expression="${ios.scheme}"
 	 */
-	private String scheme;
-	
-	/**
-	 * iOS SDK
-	 * @parameter
-	 * 		expression="${ios.sdk}"
-	 * 		default-value="iphoneos"
-	 */
-	private String sdk;
-	
-	/**
-	 * iOS code sign identity
-	 * @parameter
-	 * 		expression="${ios.codeSignIdentity}"
-	 * @required
-	 */
-	private String codeSignIdentity;
-	
-	/**
-	 * iOS configuration
-	 * @parameter
-	 * 		expression="${ios.configuration}"
-	 * 		default-value="Release"
-	 */
-	private String configuration;
+	private Map<String, String> keychainParams;
 
 	/**
 	 * iOS version 
 	 * @parameter
 	 * 		expression="${ios.version}"
+	 * 		default-value="${project.version}"
 	 */
 	private String version;
 	
 	/**
 	 * build id
 	 * @parameter
-	 * 		expression="${ios.buildId}" 
-	 * 		default-value="${project.version}"
+	 * 		expression="${ios.buildId}"
 	 */
 	private String buildId;
 
@@ -97,6 +65,7 @@ public class IOSBuildMojo extends AbstractMojo {
 	 * If the build number should be incremented
 	 * @parameter
 	 * 		expression="${ios.incrementBuildNumber}" 
+	 * 		default-value=false
 	 */
 	private boolean incrementBuildNumber;
 	
@@ -109,36 +78,185 @@ public class IOSBuildMojo extends AbstractMojo {
 	*/
 	protected MavenProject project;
 	
+	private String baseDir;
+	private File targetDir;
+	private File workDir;
+	
+	
 	/**
 	 * 
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		intialize();
+		
 		try {
-			final String targetDir = project.getBuild().getDirectory();
-			
-			if (null == version) {
-				version = project.getVersion();
-			}
-			
-			Map<String, String> properties = new HashMap<String, String>();
-			properties.put("appName", appName);
-			properties.put("workspaceName", workspaceName);
-			properties.put("projectName", projectName);
-			properties.put("codeSignIdentity", codeSignIdentity);
-			properties.put("sdk", sdk);
-			properties.put("baseDir", project.getBasedir().toString());
-			properties.put("sourceDir", sourceDir);
-			properties.put("targetDir", targetDir);
-			properties.put("configuration", configuration);
-			properties.put("buildId", buildId);
-			properties.put("version", version);
-			properties.put("incrementBuildNumber", incrementBuildNumber ? "1" : null);
-			properties.put("scheme", scheme);
-			
-			ProjectBuilder.build(properties);
-		} catch (IOSException e) {
-			throw new MojoExecutionException(e.getMessage());
+			validateParameters();
+			unlockKeychain();
+			build();
+		}
+		catch (IOSException e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
+//		catch (Exception e) {
+//			getLog().error(e.getMessage());
+//			throw new MojoFailureException(e.getMessage());
+//		}
+	}
+	
+	protected void intialize() {
+		baseDir = project.getBasedir().toString();
+		targetDir = new File(project.getBuild().getDirectory());
+		workDir = new File(baseDir + "/" + sourceDir);
+	}
+	
+	protected void validateParameters() throws IOSException {
+		if (buildParams.get("workspace") != null && buildParams.get("scheme") == null) {
+			throw new IOSException("The 'scheme' parameter is required when building a workspace");
+		}
+		
+		if (!workDir.exists()) {
+			throw new IOSException("Invalid sourceDir specified: " + workDir.getAbsolutePath());
+		}
+		
+		if (null == buildParams.get("buildConfiguration")) {
+			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
 		}
 	}
+	
+	protected void build() throws IOSException {
+		updateMarketingVersion();
+		updateBuildNumber();
+		
+		xcodebuild();
+		xcrun();
+	}
+	
+	protected void updateMarketingVersion() throws IOSException {
+		ProcessBuilder pb = new ProcessBuilder(
+				"agvtool",
+				"new-marketing-version",
+				version);
+		pb.directory(workDir);
+		executeCommand(pb);
+	}
+	
+	protected void updateBuildNumber() throws IOSException {
+		if (buildId != null) {
+			ProcessBuilder pb = new ProcessBuilder(
+					"agvtool",
+					"new-version",
+					"-all",
+					buildId);
+			pb.directory(workDir);
+			executeCommand(pb);
+		}
+		else if (incrementBuildNumber) {
+			ProcessBuilder pb = new ProcessBuilder(
+					"agvtool",
+					"next-version",
+					"-all");
+			pb.directory(workDir);
+			executeCommand(pb);
+		}
+	}
+	
+	protected void unlockKeychain() throws IOSException {
+		if (null == keychainParams 
+				|| null == keychainParams.get("path") 
+				|| null == keychainParams.get("password")) {
+			return;
+		}
 
+		List<String> keychainParameters = new ArrayList<String>();
+		keychainParameters.add("security");
+		keychainParameters.add("unlock-keychain");
+		keychainParameters.add("-p");
+		keychainParameters.add(keychainParams.get("password"));
+		keychainParameters.add(keychainParams.get("path"));
+
+		ProcessBuilder pb = new ProcessBuilder(keychainParameters);
+		executeCommand(pb);
+	}
+	
+	protected void xcodebuild() throws IOSException {
+		List<String> parameters = createXcodebuildParameters();
+		
+		ProcessBuilder pb = new ProcessBuilder(parameters);
+		pb.directory(workDir);
+		executeCommand(pb);
+	}
+	
+	protected void xcrun()  throws IOSException {
+		List<String> parameters = createXcrunParameters();
+		
+		ProcessBuilder pb = new ProcessBuilder(parameters);
+		pb.directory(workDir);
+		executeCommand(pb);
+	}
+	
+	protected List<String> createXcodebuildParameters() {
+		List<String> parameters = new ArrayList<String>();
+		parameters.add("xcodebuild");
+		
+		if (buildParams.get("workspace") != null) {
+			String workspaceName = buildParams.get("workspace");
+			String workspaceSuffix = ".xcworkspace";
+			if (!workspaceName.endsWith(workspaceSuffix)) {
+				workspaceName += workspaceSuffix;
+			}
+			
+			parameters.add("-workspace");
+			parameters.add(workspaceName);
+		}
+		else if (buildParams.get("project") != null) {
+			String projectName = buildParams.get("project");
+			String projectSuffix = ".xcodeproj";
+			if (!projectName.endsWith(projectSuffix)) {
+				projectName += projectSuffix;
+			}
+			
+			parameters.add("-project");
+			parameters.add(projectName);
+		}
+		
+		if (buildParams.get("scheme") != null) {
+			parameters.add("-scheme");
+			parameters.add(buildParams.get("scheme"));
+		}
+		
+		parameters.add("-sdk");
+		parameters.add(DEFAULT_SDK);
+		parameters.add("-configuration");
+		parameters.add(buildParams.get("buildConfiguration"));
+		
+		parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
+		
+		if (buildParams.get("codeSignIdentity") != null) {
+			parameters.add("CODE_SIGN_IDENTITY=" + buildParams.get("codeSignIdentity"));
+		}
+		
+		return parameters;
+	}
+	
+	protected List<String> createXcrunParameters() {
+		String artifactsPath = targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
+		
+		List<String> parameters = new ArrayList<String>();
+		parameters.add("xcrun");
+		
+		parameters.add("-sdk");
+		parameters.add(DEFAULT_SDK);
+		parameters.add("PackageApplication");
+		parameters.add("-v");
+		parameters.add(artifactsPath + appName + ".app");
+		parameters.add("-o");
+		parameters.add(artifactsPath + appName + ".ipa");
+		
+		if (buildParams.get("codeSignIdentity") != null) {
+			parameters.add("--sign");
+			parameters.add(buildParams.get("codeSignIdentity"));
+		}
+		
+		return parameters;
+	}
 }

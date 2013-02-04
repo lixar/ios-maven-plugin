@@ -1,8 +1,8 @@
 package com.brewinapps.ios;
 
 import java.io.File;
+import java.util.Map;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -14,7 +14,7 @@ import org.apache.maven.project.MavenProject;
  * @goal package
  * @phase package
  */
-public class IOSPackageMojo extends AbstractMojo {
+public class IOSPackageMojo extends IOSAbstractMojo {
 	
 	/**
 	 * iOS app name
@@ -25,12 +25,11 @@ public class IOSPackageMojo extends AbstractMojo {
 	private String appName;
 	
 	/**
-	 * iOS configuration
+	 * iOS build parameters
 	 * @parameter
-	 * 		expression="${ios.configuration}"
-	 * 		default-value="Release"
+	 * 		expression="${ios.buildParams}"
 	 */
-	private String configuration;
+	private Map<String, String> buildParams;
 	
 	/**
 	* The maven project.
@@ -41,28 +40,46 @@ public class IOSPackageMojo extends AbstractMojo {
 	*/
 	protected MavenProject project;
 	
+	private String appDir;
+	private String targetDir;
+	
+	
 	/**
 	 * 
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			final String targetDir = project.getBuild().getDirectory();
-			final String appDir = targetDir + "/" + configuration + "-iphoneos/";
-			final String artifactName = appName + ".zip";
+			intialize();
+			validateParameters();
 			
-			ProcessBuilder pb = new ProcessBuilder(
-					"zip",
-					"-r", 
-					artifactName, 
-					appName + ".app.dSYM",
-					appName + ".ipa");
-			pb.directory(new File(appDir));
-			CommandHelper.performCommand(pb);
-
-			project.getArtifact().setFile(new File(appDir + "/" + artifactName));
+			final String packageName = appName + ".zip";
+			packageApp(packageName);
+			
+			project.getArtifact().setFile(new File(appDir + "/" + packageName));
 		} catch (IOSException e) {
 			throw new MojoExecutionException(e.getMessage());
 		}
 	}
-
+	
+	protected void intialize() {
+		targetDir = project.getBuild().getDirectory();
+		appDir = targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
+	}
+	
+	protected void validateParameters() throws IOSException {
+		if (null == buildParams.get("buildConfiguration")) {
+			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
+		}
+	}
+	
+	protected void packageApp(String packageName) throws IOSException {
+		ProcessBuilder pb = new ProcessBuilder(
+				"zip",
+				"-r", 
+				packageName, 
+				appName + ".app.dSYM",
+				appName + ".ipa");
+		pb.directory(new File(appDir));
+		executeCommand(pb);
+	}
 }
