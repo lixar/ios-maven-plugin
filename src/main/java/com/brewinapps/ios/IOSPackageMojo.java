@@ -52,7 +52,12 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 			intialize();
 			validateParameters();
 			
-			final String packageName = appName + ".zip";
+			String finalName = project.getBuild().getFinalName();
+			if (null == finalName) {
+				finalName = appName;
+			}
+			
+			final String packageName = finalName + ".zip";
 			packageApp(packageName);
 			
 			project.getArtifact().setFile(new File(appDir + "/" + packageName));
