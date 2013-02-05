@@ -24,26 +24,44 @@ Compiles the application and generates an IPA package
 
 1. ios.sourceDir
 2. ios.appName
-3. ios.scheme
-4. ios.sdk
-5. ios.codeSignIdentity
-6. ios.configuration
-7. ios.buildId
+3. ios.buildId
+4. ios.incrementBuildNumber
+5. buildParams
+    * workspace
+    * project
+    * scheme
+    * sdk
+    * buildConfiguration
+    * codeSignIdentity
+6. keychainParams
+    * password
+    * path
+
 
 ### ios:deploy
 Deploys the IPA package as well as the generated dSYM.zip to HockeyApp
 
 **Parameters**
 
+
 1. ios.sourceDir
 2. ios.appName
-3. ios.scheme
-4. ios.sdk
-5. ios.codeSignIdentity
-6. ios.configuration
-8. ios.buildId
-9. ios.hockeyAppToken
-10. ios.releaseNotes
+3. ios.buildId
+4. ios.incrementBuildNumber
+5. buildParams
+    * workspace
+    * project
+    * scheme
+    * sdk
+    * buildConfiguration
+    * codeSignIdentity
+6. keychainParams
+    * password
+    * path
+7. hockeyApp
+    * apiToken
+    * appIdentifier
+    * releaseNotes
 
 ## Getting started with ios-maven-plugin and Jenkins
 
@@ -55,25 +73,20 @@ Deploys the IPA package as well as the generated dSYM.zip to HockeyApp
         <version>1.1-SNAPSHOT</version>
         <extensions>true</extensions>                
         <configuration>
-            <codeSignIdentity>iPhone Distribution: ACME Inc</codeSignIdentity>
             <appName>AcmeApp</appName>
-        </configuration>				                
+            <buildParams>
+                <codeSignIdentity>iPhone Distribution: ACME Inc</codeSignIdentity>
+            </buildParams>
+        </configuration>
     </plugin>
             
 **Compile to verify**
 
     mvn clean compile
 
-**Allow jenkins to access your keychain**
-
-To sign the package, unlock the keychain on the jenkins node. The two commands below can be set up as a pre-build shell script.
-
-    security list-keychains -s ~/Library/Keychains/jenkins.keychain
-    security unlock-keychain -p CHANGEME ~/Library/Keychains/jenkins.keychain
-
 **Deploy to HockeyApp**
 
-To deploy to HockeyApp add `-Dios.hockeyAppToken=YOUR_TOKEN` as an argument and invoke `mvn ios:deploy`.
+To deploy to HockeyApp make sure to provide `hockeyApp` parameters and invoke `mvn ios:deploy`.
 
 ### Tips
 1. ios-maven-plugin sets the CFBundleShortVersionString to the Maven project version by default. You can override this behaviour by adding the `-Dios.version` argument.
