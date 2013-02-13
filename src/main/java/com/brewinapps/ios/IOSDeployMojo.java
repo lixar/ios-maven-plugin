@@ -86,8 +86,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 	
 	protected void initialize() {
 		targetDir = project.getBuild().getDirectory();
-		appDir = project.getBasedir().getAbsoluteFile() + 
-				"/" + targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
+		appDir = targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
 	}
 	
 	protected void deploy() throws IOSException {
