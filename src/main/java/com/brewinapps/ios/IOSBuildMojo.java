@@ -235,6 +235,10 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 			parameters.add("CODE_SIGN_IDENTITY=" + buildParams.get("codeSignIdentity"));
 		}
 		
+		if (buildParams.get("settings") != null) {
+			parameters.add(buildParams.get("settings"));
+		}
+		
 		return parameters;
 	}
 	
