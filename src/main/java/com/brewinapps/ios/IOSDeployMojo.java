@@ -29,7 +29,7 @@ import org.apache.maven.project.MavenProject;
  * 
  * @author Brewin' Apps AS
  * @goal deploy
- * @execute phase="compile"
+ * @phase deploy
  */
 public class IOSDeployMojo extends IOSAbstractMojo {
 	
@@ -111,6 +111,11 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 		
 		if (null == buildParams.get("buildConfiguration")) {
 			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
+		}
+		
+		String ipaPath = appDir + appName + ".ipa";
+		if (!(new File(ipaPath)).exists()) {
+			throw new IOSException("Could not find ipa file at '" + ipaPath + "'. You must compile the artifact before deploying.");
 		}
 	}
 	

@@ -97,10 +97,10 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		catch (IOSException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
-//		catch (Exception e) {
-//			getLog().error(e.getMessage());
-//			throw new MojoFailureException(e.getMessage());
-//		}
+		catch (Exception e) {
+			getLog().error(e.getMessage());
+			throw new MojoFailureException(e.getMessage());
+		}
 	}
 	
 	protected void intialize() {
