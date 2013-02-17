@@ -45,29 +45,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	 * @parameter
 	 */
 	private Map<String, String> keychainParams;
-
-	/**
-	 * iOS version 
-	 * @parameter
-	 * 		expression="${ios.version}"
-	 * 		default-value="${project.version}"
-	 */
-	private String version;
-	
-	/**
-	 * build id
-	 * @parameter
-	 * 		expression="${ios.buildId}"
-	 */
-	private String buildId;
-
-	/**
-	 * If the build number should be incremented
-	 * @parameter
-	 * 		expression="${ios.incrementBuildNumber}" 
-	 * 		default-value=false
-	 */
-	private boolean incrementBuildNumber;
 	
 	/**
 	* The maven project.
@@ -81,6 +58,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	private String baseDir;
 	private File targetDir;
 	private File workDir;
+	private String appDir;
 	
 	
 	/**
@@ -103,9 +81,14 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	protected void intialize() {
+		if (null == buildParams.get("buildConfiguration")) {
+			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
+		}
+		
 		baseDir = project.getBasedir().toString();
 		targetDir = new File(project.getBuild().getDirectory());
 		workDir = new File(baseDir + File.separator + sourceDir);
+		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}
 	
 	protected void validateParameters() throws IOSException {
@@ -116,46 +99,15 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		if (!workDir.exists()) {
 			throw new IOSException("Invalid sourceDir specified: " + workDir.getAbsolutePath());
 		}
-		
-		if (null == buildParams.get("buildConfiguration")) {
-			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
-		}
 	}
 	
 	protected void build() throws IOSException {
-		updateMarketingVersion();
-		updateBuildNumber();
 		
 		xcodebuild();
 		xcrun();
 	}
 	
-	protected void updateMarketingVersion() throws IOSException {
-		ProcessBuilder pb = new ProcessBuilder(
-				"agvtool",
-				"new-marketing-version",
-				version);
-		pb.directory(workDir);
-		executeCommand(pb);
-	}
-	
-	protected void updateBuildNumber() throws IOSException {
-		if (buildId != null) {
-			ProcessBuilder pb = new ProcessBuilder(
-					"agvtool",
-					"new-version",
-					"-all",
-					buildId);
-			pb.directory(workDir);
-			executeCommand(pb);
 		}
-		else if (incrementBuildNumber) {
-			ProcessBuilder pb = new ProcessBuilder(
-					"agvtool",
-					"next-version",
-					"-all");
-			pb.directory(workDir);
-			executeCommand(pb);
 		}
 	}
 	
@@ -242,8 +194,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	protected List<String> createXcrunParameters() {
-		String artifactsPath = targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
-		
 		List<String> parameters = new ArrayList<String>();
 		parameters.add("xcrun");
 		
@@ -251,9 +201,9 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		parameters.add(DEFAULT_SDK);
 		parameters.add("PackageApplication");
 		parameters.add("-v");
-		parameters.add(artifactsPath + appName + ".app");
+		parameters.add(appDir + appName + ".app");
 		parameters.add("-o");
-		parameters.add(artifactsPath + appName + ".ipa");
+		parameters.add(appDir + appName + ".ipa");
 		
 		if (buildParams.get("codeSignIdentity") != null) {
 			parameters.add("--sign");
