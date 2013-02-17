@@ -93,11 +93,10 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 			validateParameters();
 			unlockKeychain();
 			build();
-		}
-		catch (IOSException e) {
+		} catch (IOSException e) {
+			getLog().error(e.getMessage());
 			throw new MojoExecutionException(e.getMessage(), e);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			getLog().error(e.getMessage());
 			throw new MojoFailureException(e.getMessage());
 		}
@@ -106,7 +105,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	protected void intialize() {
 		baseDir = project.getBasedir().toString();
 		targetDir = new File(project.getBuild().getDirectory());
-		workDir = new File(baseDir + "/" + sourceDir);
+		workDir = new File(baseDir + File.separator + sourceDir);
 	}
 	
 	protected void validateParameters() throws IOSException {

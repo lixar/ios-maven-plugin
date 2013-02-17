@@ -78,15 +78,18 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 			validateParameters();
 			
 			deploy();
-		}
-		catch (IOSException e) {
-			throw new MojoExecutionException(e.getMessage());
+		} catch (IOSException e) {
+			getLog().error(e.getMessage());
+			throw new MojoExecutionException(e.getMessage(), e);
+		} catch (Exception e) {
+			getLog().error(e.getMessage());
+			throw new MojoFailureException(e.getMessage());
 		}
 	}
 	
 	protected void initialize() {
 		targetDir = project.getBuild().getDirectory();
-		appDir = targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
+		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}
 	
 	protected void deploy() throws IOSException {

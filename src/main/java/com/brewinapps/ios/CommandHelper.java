@@ -16,14 +16,14 @@ public class CommandHelper {
 	 * @param pb
 	 * @throws IOSException
 	 */
-	public static void performCommand(final ProcessBuilder pb, Log logger) throws IOSException {
+	public static String performCommand(final ProcessBuilder pb, Log logger) throws IOSException {
 		pb.redirectErrorStream(true);
 		
 		StringBuilder joinedCommand = new StringBuilder();
 		for (String segment : pb.command()) {
 			joinedCommand.append(segment + " ");
 		}
-		logger.info("Executing '" + joinedCommand.toString().trim() + "'\n");
+		logger.info("Executing '" + joinedCommand.toString().trim() + "'");
 		
 		Process p = null;
 		try {
@@ -36,12 +36,16 @@ public class CommandHelper {
 				new InputStreamReader(p.getInputStream()));
 		
 		int rc;
+		String returnValue = null;
 		try {
 			// Display output
 			String outLine = null;
+			StringBuilder sb = new StringBuilder();
 			while ((outLine = input.readLine()) != null) {
-				logger.info(outLine);
+				sb.append(outLine);
+				logger.debug(outLine);
 			}
+			returnValue = sb.toString();
 			input.close();
 		} catch (IOException e) {
 			throw new IOSException("An error occured while reading the input stream");
@@ -54,8 +58,9 @@ public class CommandHelper {
 		}
 		
 		if (rc != 0) {
-			throw new IOSException("The XC command was unsuccessful");
+			throw new IOSException("The command was unsuccessful");
 		}
+		
+		return returnValue;
 	}
-
 }

@@ -60,15 +60,19 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 			final String packageName = finalName + ".zip";
 			packageApp(packageName);
 			
-			project.getArtifact().setFile(new File(appDir + "/" + packageName));
+			project.getArtifact().setFile(new File(appDir + File.separator + packageName));
 		} catch (IOSException e) {
-			throw new MojoExecutionException(e.getMessage());
+			getLog().error(e.getMessage());
+			throw new MojoExecutionException(e.getMessage(), e);
+		} catch (Exception e) {
+			getLog().error(e.getMessage());
+			throw new MojoFailureException(e.getMessage());
 		}
 	}
 	
 	protected void intialize() {
 		targetDir = project.getBuild().getDirectory();
-		appDir = targetDir + "/" + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + "/";
+		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}
 	
 	protected void validateParameters() throws IOSException {
