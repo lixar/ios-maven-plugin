@@ -208,6 +208,10 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 			parameters.add("-scheme");
 			parameters.add(buildParams.get("scheme"));
 		}
+		else if (null != buildParams.get("target")) {
+			parameters.add("-target");
+			parameters.add(buildParams.get("target"));
+		}
 		
 		parameters.add("-sdk");
 		parameters.add(DEFAULT_SDK);
