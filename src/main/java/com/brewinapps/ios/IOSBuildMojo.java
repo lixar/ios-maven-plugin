@@ -35,6 +35,14 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	private String appName;
 	
 	/**
+	 * If the pods should be updated (assuming the project uses CocoaPods)
+	 * @parameter
+	 * 		expression="${ios.updatePods}"
+	 * 		default-value="true"
+	 */
+	private boolean updatePods;
+	
+	/**
 	 * iOS build parameters
 	 * @parameter
 	 */
@@ -91,6 +99,17 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}
 	
+	protected boolean hasPodfile() {
+		File podfile = new File(workDir + File.separator + "Podfile");
+		getLog().info(podfile.toString());
+		return podfile.exists();
+	}
+	
+	protected boolean hasPodfileLock() {
+		File podfileLock = new File(workDir + File.separator + "Podfile.lock");
+		return podfileLock.exists();
+	}
+	
 	protected void validateParameters() throws IOSException {
 		if (buildParams.get("workspace") != null && buildParams.get("scheme") == null) {
 			throw new IOSException("The 'scheme' parameter is required when building a workspace");
@@ -102,13 +121,28 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	protected void build() throws IOSException {
+		if (updatePods && hasPodfile()) {
+			updatePods();
+		}
 		
 		xcodebuild();
 		xcrun();
 	}
 	
+	protected void updatePods() throws IOSException {
+		List<String> podParams = new ArrayList<String>();
+		podParams.add("pod");
+		
+		if (hasPodfileLock()) {
+			podParams.add("update");
 		}
+		else {
+			podParams.add("install");
 		}
+		
+		ProcessBuilder pb = new ProcessBuilder(podParams);
+		pb.directory(workDir);
+		executeCommand(pb);
 	}
 	
 	protected void unlockKeychain() throws IOSException {
