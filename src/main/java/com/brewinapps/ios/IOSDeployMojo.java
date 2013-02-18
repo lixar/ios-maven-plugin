@@ -189,18 +189,50 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 		entity.addPart("ipa", new FileBody(ipaFile, "application/zip"));
 		entity.addPart("dsym", new FileBody(dsymZipFile, "application/zip"));
 		
-		String releaseNotes = hockeyApp.get("releaseNotes");
-		if (releaseNotes != null) {
-			StringBody notesBody;
-			try {
-				
-				notesBody = new StringBody(releaseNotes, "text/plain", Charset.forName("UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				throw new IOSException(e);
-			}
+		StringBody notesBody = createStringBody("notes");
+		if (null != notesBody) {
 			entity.addPart("notes", notesBody);
 		}
 		
+		StringBody notesTypeBody = createStringBody("notesType");
+		if (null != notesTypeBody) {
+			entity.addPart("notes_type", notesTypeBody);
+		}
+		
+		StringBody notifyBody = createStringBody("notify");
+		if (null != notifyBody) {
+			entity.addPart("notify", notifyBody);
+		}
+		
+		StringBody statusBody = createStringBody("status");
+		if (null != statusBody) {
+			entity.addPart("status", statusBody);
+		}
+		
+		StringBody mandatoryBody = createStringBody("mandatory");
+		if (null != mandatoryBody) {
+			entity.addPart("mandatory", mandatoryBody);
+		}
+		
+		StringBody tagsBody = createStringBody("tags");
+		if (null != tagsBody) {
+			entity.addPart("tags", tagsBody);
+		}
+		
 		return entity;
+	}
+	
+	protected StringBody createStringBody(String paramName) throws IOSException {
+		StringBody body = null;
+		String paramValue = hockeyApp.get(paramName);
+		if (paramValue != null) {
+			try {
+				body = new StringBody(paramValue, "text/plain", Charset.forName("UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				throw new IOSException(e);
+			}
+		}
+		
+		return body;
 	}
 }
