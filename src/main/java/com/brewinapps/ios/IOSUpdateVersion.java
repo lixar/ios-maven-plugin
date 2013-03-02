@@ -75,6 +75,10 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
 		String baseDir = project.getBasedir().toString();
 		workDir = new File(baseDir + File.separator + sourceDir);
 		
+		if (null == version || 0 == version.length()) {
+			version = project.getVersion();
+		}
+		
 		getLog().info("Updating iOS version");
 	}
 	
