@@ -29,18 +29,18 @@
 	<distributionManagement>
 		<repository>
 			<id>lixar-maven-repository</id>
-			<url>http://nexus.lixar.net/content/repositories/lixar-maven-repository/</url>
+			<url>http://nexus.lixar.net/nexus/content/repositories/lixar-maven-repository/</url>
 		</repository>
 		<snapshotRepository>
 			<id>lixar-maven-snapshots</id>
-			<url>http://nexus.lixar.net/content/repositories/lixar-maven-snapshots/</url>
+			<url>http://nexus.lixar.net/nexus/content/repositories/lixar-maven-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 	
 	<repositories>
 		<repository>
 			<id>lixar-maven-repository</id>
-			<url>http://nexus.lixar.net/content/repositories/lixar-maven-repository/</url>
+			<url>http://nexus.lixar.net/nexus/content/repositories/lixar-maven-repository/</url>
 		</repository>
 	</repositories>
 
