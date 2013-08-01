@@ -1,4 +1,23 @@
-.project
-.classpath
-.settings/
+# OS X temporary files that should never be committed
+*~
+.DS_Store
+*.swp
+*.lock
+profile
+
+# Project files
+*.project
+*.settings
+*.checkstyle
+*.classpath
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# Build
 target/
+build/
+logs/
+*.log
+test-output/
