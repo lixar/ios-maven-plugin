@@ -60,7 +60,7 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			intialize();
+			initialize();
 			updateVersion();
 		} catch (IOSException e) {
 			getLog().error(e.getMessage());
@@ -71,7 +71,7 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
 		}
 	}
 	
-	protected void intialize() throws IOSException {
+	protected void initialize() {
 		String baseDir = project.getBasedir().toString();
 		workDir = new File(baseDir + File.separator + sourceDir);
 		
@@ -125,8 +125,7 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
 				"what-version",
 				"-terse");
 		pb.directory(workDir);
-		String result = executeCommand(pb);
 		
-		return result;
+		return executeCommand(pb);
 	}
 }

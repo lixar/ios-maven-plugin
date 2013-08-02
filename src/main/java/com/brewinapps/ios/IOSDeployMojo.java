@@ -87,7 +87,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 		}
 	}
 	
-	protected void initialize() {
+	void initialize() {
 		targetDir = project.getBuild().getDirectory();
 		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}

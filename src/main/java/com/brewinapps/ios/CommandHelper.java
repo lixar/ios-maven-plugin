@@ -21,11 +21,11 @@ public class CommandHelper {
 		
 		StringBuilder joinedCommand = new StringBuilder();
 		for (String segment : pb.command()) {
-			joinedCommand.append(segment + " ");
+			joinedCommand.append(segment).append(" ");
 		}
 		logger.info("Executing '" + joinedCommand.toString().trim() + "'");
 		
-		Process p = null;
+		Process p;
 		try {
 			p = pb.start();
 		} catch (IOException e) {
@@ -36,10 +36,10 @@ public class CommandHelper {
 				new InputStreamReader(p.getInputStream()));
 		
 		int rc;
-		String returnValue = null;
+		String returnValue;
 		try {
 			// Display output
-			String outLine = null;
+			String outLine;
 			StringBuilder sb = new StringBuilder();
 			while ((outLine = input.readLine()) != null) {
 				sb.append(outLine);
@@ -48,7 +48,7 @@ public class CommandHelper {
 			returnValue = sb.toString();
 			input.close();
 		} catch (IOException e) {
-			throw new IOSException("An error occured while reading the input stream");
+			throw new IOSException("An error occurred while reading the input stream");
 		}
 		
 		try {

@@ -49,7 +49,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			intialize();
+			initialize();
 			validateParameters();
 			
 			String finalName = project.getBuild().getFinalName();
@@ -70,7 +70,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 		}
 	}
 	
-	protected void intialize() {
+	void initialize() {
 		targetDir = project.getBuild().getDirectory();
 		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}

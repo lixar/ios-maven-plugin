@@ -73,7 +73,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	 * 
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		intialize();
+		initialize();
 		
 		try {
 			validateParameters();
@@ -88,7 +88,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		}
 	}
 	
-	protected void intialize() {
+	void initialize() {
 		if (null == buildParams.get("buildConfiguration")) {
 			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
 		}
@@ -99,7 +99,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
 	}
 	
-	protected boolean hasPodfile() {
+	boolean hasPodfile() {
 		File podfile = new File(workDir + File.separator + "Podfile");
 		getLog().info(podfile.toString());
 		return podfile.exists();
