@@ -248,7 +248,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		parameters.add("-v");
 		parameters.add(appDir + appName + ".app");
 		parameters.add("-o");
-		parameters.add(appDir + appName + ".ipa");
+		parameters.add(appDir + project.getBuild().getFinalName() + ".ipa");
 		
 		if (buildParams.get("codeSignIdentity") != null) {
 			parameters.add("--sign");
