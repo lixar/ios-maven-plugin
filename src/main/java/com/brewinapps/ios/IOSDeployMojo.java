@@ -46,14 +46,14 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 	 * 		expression="${ios.appName}"
 	 * @required
 	 */
-	private String appName;	
-	
-	/**
-	 * iOS build parameters
-	 * @parameter
-	 * 		expression="${ios.buildParams}"
-	 */
-	private Map<String, String> buildParams;
+	private String appName;
+
+    /**
+     * iOS build configuration
+     * @parameter
+     * 		expression="${ios.buildConfiguration}"
+     */
+    private String buildConfiguration;
 	
 	/**
 	* The maven project.
@@ -89,7 +89,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 	
 	void initialize() {
 		targetDir = project.getBuild().getDirectory();
-		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
+		appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
 	}
 	
 	protected void deploy() throws IOSException {
@@ -112,11 +112,11 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 			throw new IOSException("The 'hockeyAppIdentifier' parameter is required to upload to Hockey App");
 		}
 		
-		if (null == buildParams.get("buildConfiguration")) {
-			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
+		if (null == buildConfiguration) {
+            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
 		}
 		
-		String ipaPath = appDir + appName + ".ipa";
+		String ipaPath = appDir + project.getBuild().getFinalName() + ".ipa";
 		if (!(new File(ipaPath)).exists()) {
 			throw new IOSException("Could not find ipa file at '" + ipaPath + "'. You must compile the artifact before deploying.");
 		}
@@ -126,7 +126,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 		ProcessBuilder pb = new ProcessBuilder(
 				"zip",
 				"-r", 
-				appName + ".dSYM.zip", 
+				appName + ".dSYM.zip",
 				appName + ".app.dSYM");
 		pb.directory(new File(appDir));
 		executeCommand(pb);

@@ -35,18 +35,67 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	private String appName;
 	
 	/**
-	 * If the pods should be updated (assuming the project uses CocoaPods)
+	 * If the install/update of the pods should be skipped (assuming the project uses CocoaPods)
 	 * @parameter
-	 * 		expression="${ios.updatePods}"
-	 * 		default-value="true"
+	 * 		expression="${ios.skipPodsUpdate}"
+	 * 		default-value="false"
 	 */
-	private boolean updatePods;
-	
+	private boolean skipPodsUpdate;
+
+    /**
+     * iOS project name
+     * @parameter
+     * 		expression="${ios.projectName}"
+     */
+    private String projectName;
+
+    /**
+     * iOS workspace name
+     * @parameter
+     * 		expression="${ios.workspaceName}"
+     */
+    private String workspaceName;
+
+    /**
+     * iOS scheme
+     * @parameter
+     * 		expression="${ios.scheme}"
+     */
+    private String scheme;
+
+    /**
+     * iOS scheme
+     * @parameter
+     * 		expression="${ios.target}"
+     */
+    private String target;
+
+    /**
+     * iOS sdk
+     * @parameter
+     * 		expression="${ios.sdk}"
+     */
+    private String sdk;
+
+    /**
+     * iOS build configuration
+     * @parameter
+     * 		expression="${ios.buildConfiguration}"
+     */
+    private String buildConfiguration;
+
+    /**
+     * iOS code sign identity
+     * @parameter
+     * 		expression="${ios.codeSignIdentity}"
+     */
+    private String codeSignIdentity;
+
 	/**
-	 * iOS build parameters
+	 * iOS build settings
 	 * @parameter
 	 */
-	private Map<String, String> buildParams;
+	private Map<String, String> buildSettings;
 	
 	/**
 	 * Keychain parameters
@@ -67,9 +116,9 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	private File targetDir;
 	private File workDir;
 	private String appDir;
-	
-	
-	/**
+
+
+    /**
 	 * 
 	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -89,14 +138,18 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	void initialize() {
-		if (null == buildParams.get("buildConfiguration")) {
-			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
+		if (null == buildConfiguration) {
+            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
 		}
-		
+
+        if (null == sdk) {
+            sdk = DEFAULT_SDK;
+        }
+
 		baseDir = project.getBasedir().toString();
 		targetDir = new File(project.getBuild().getDirectory());
 		workDir = new File(baseDir + File.separator + sourceDir);
-		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
+		appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
 	}
 	
 	boolean hasPodfile() {
@@ -111,7 +164,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	protected void validateParameters() throws IOSException {
-		if (buildParams.get("workspace") != null && buildParams.get("scheme") == null) {
+		if (workspaceName != null && scheme == null) {
 			throw new IOSException("The 'scheme' parameter is required when building a workspace");
 		}
 		
@@ -121,7 +174,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	protected void build() throws IOSException {
-		if (updatePods && hasPodfile()) {
+		if (!skipPodsUpdate && hasPodfile()) {
 			updatePods();
 		}
 		
@@ -183,8 +236,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		List<String> parameters = new ArrayList<String>();
 		parameters.add("xcodebuild");
 		
-		if (buildParams.get("workspace") != null) {
-			String workspaceName = buildParams.get("workspace");
+		if (workspaceName != null) {
 			String workspaceSuffix = ".xcworkspace";
 			if (!workspaceName.endsWith(workspaceSuffix)) {
 				workspaceName += workspaceSuffix;
@@ -193,8 +245,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 			parameters.add("-workspace");
 			parameters.add(workspaceName);
 		}
-		else if (buildParams.get("project") != null) {
-			String projectName = buildParams.get("project");
+		else if (projectName != null) {
 			String projectSuffix = ".xcodeproj";
 			if (!projectName.endsWith(projectSuffix)) {
 				projectName += projectSuffix;
@@ -204,36 +255,30 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 			parameters.add(projectName);
 		}
 		
-		if (buildParams.get("scheme") != null) {
+		if (scheme != null) {
 			parameters.add("-scheme");
-			parameters.add(buildParams.get("scheme"));
+			parameters.add(scheme);
 		}
-		else if (null != buildParams.get("target")) {
+		else if (null != target) {
 			parameters.add("-target");
-			parameters.add(buildParams.get("target"));
+			parameters.add(target);
 		}
 
-		if (buildParams.get("sdk") != null) {
-			parameters.add("-sdk");
-			parameters.add(buildParams.get("sdk"));
-		}
-		else {
-			parameters.add("-sdk");
-			parameters.add(DEFAULT_SDK);
-		}
+        parameters.add("-sdk");
+        parameters.add(sdk);
 
 		parameters.add("-configuration");
-		parameters.add(buildParams.get("buildConfiguration"));
-		
+		parameters.add(buildConfiguration);
+
+        if (null != buildSettings) {
+            for (Map.Entry<String, String> entry : buildSettings.entrySet()) {
+                parameters.add(entry.getKey() + "=" + entry.getValue());
+            }
+        }
+        if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
+            parameters.add("CODE_SIGN_IDENTITY=" + codeSignIdentity);
+        }
 		parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
-		
-		if (buildParams.get("codeSignIdentity") != null) {
-			parameters.add("CODE_SIGN_IDENTITY=" + buildParams.get("codeSignIdentity"));
-		}
-		
-		if (buildParams.get("settings") != null) {
-			parameters.add(buildParams.get("settings"));
-		}
 		
 		return parameters;
 	}
@@ -243,16 +288,16 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		parameters.add("xcrun");
 		
 		parameters.add("-sdk");
-		parameters.add(DEFAULT_SDK);
+		parameters.add(sdk);
 		parameters.add("PackageApplication");
 		parameters.add("-v");
 		parameters.add(appDir + appName + ".app");
 		parameters.add("-o");
 		parameters.add(appDir + project.getBuild().getFinalName() + ".ipa");
 		
-		if (buildParams.get("codeSignIdentity") != null) {
+		if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
 			parameters.add("--sign");
-			parameters.add(buildParams.get("codeSignIdentity"));
+			parameters.add(codeSignIdentity);
 		}
 		
 		return parameters;
