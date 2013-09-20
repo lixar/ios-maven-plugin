@@ -1,7 +1,6 @@
 package com.brewinapps.ios;
 
 import java.io.File;
-import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -23,13 +22,13 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 	 * @required
 	 */
 	private String appName;
-	
-	/**
-	 * iOS build parameters
-	 * @parameter
-	 * 		expression="${ios.buildParams}"
-	 */
-	private Map<String, String> buildParams;
+
+    /**
+     * iOS build configuration
+     * @parameter
+     * 		expression="${ios.buildConfiguration}"
+     */
+    private String buildConfiguration;
 	
 	/**
 	* The maven project.
@@ -52,12 +51,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 			initialize();
 			validateParameters();
 			
-			String finalName = project.getBuild().getFinalName();
-			if (null == finalName) {
-				finalName = appName;
-			}
-			
-			final String packageName = finalName + ".zip";
+			final String packageName = project.getBuild().getFinalName() + ".zip";
 			packageApp(packageName);
 			
 			project.getArtifact().setFile(new File(appDir + File.separator + packageName));
@@ -72,12 +66,12 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 	
 	void initialize() {
 		targetDir = project.getBuild().getDirectory();
-		appDir = targetDir + File.separator + buildParams.get("buildConfiguration") + "-" + DEFAULT_SDK + File.separator;
+		appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
 	}
 	
 	protected void validateParameters() throws IOSException {
-		if (null == buildParams.get("buildConfiguration")) {
-			buildParams.put("buildConfiguration", DEFAULT_BUILD_CONFIGURATION);
+		if (null == buildConfiguration) {
+            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
 		}
 	}
 	
@@ -87,7 +81,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
 				"-r", 
 				packageName, 
 				appName + ".app.dSYM",
-				appName + ".ipa");
+				project.getBuild().getFinalName() + ".ipa");
 		pb.directory(new File(appDir));
 		executeCommand(pb);
 	}
