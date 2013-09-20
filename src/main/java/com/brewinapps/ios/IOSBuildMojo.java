@@ -35,12 +35,12 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	private String appName;
 	
 	/**
-	 * If the pods should be updated (assuming the project uses CocoaPods)
+	 * If the install/update of the pods should be skipped (assuming the project uses CocoaPods)
 	 * @parameter
-	 * 		expression="${ios.updatePods}"
-	 * 		default-value="true"
+	 * 		expression="${ios.skipPodsUpdate}"
+	 * 		default-value="false"
 	 */
-	private boolean updatePods;
+	private boolean skipPodsUpdate;
 
     /**
      * iOS project name
@@ -174,7 +174,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 	}
 	
 	protected void build() throws IOSException {
-		if (updatePods && hasPodfile()) {
+		if (!skipPodsUpdate && hasPodfile()) {
 			updatePods();
 		}
 		
