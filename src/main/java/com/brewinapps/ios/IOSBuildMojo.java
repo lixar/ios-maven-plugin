@@ -84,6 +84,13 @@ public class IOSBuildMojo extends IOSAbstractMojo {
      */
     private String buildConfiguration;
 
+    /**
+     * iOS code sign identity
+     * @parameter
+     * 		expression="${ios.codeSignIdentity}"
+     */
+    private String codeSignIdentity;
+
 	/**
 	 * iOS build settings
 	 * @parameter
@@ -268,6 +275,9 @@ public class IOSBuildMojo extends IOSAbstractMojo {
                 parameters.add(entry.getKey() + "=" + entry.getValue());
             }
         }
+        if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
+            parameters.add("CODE_SIGN_IDENTITY=" + codeSignIdentity);
+        }
 		parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
 		
 		return parameters;
@@ -278,16 +288,16 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 		parameters.add("xcrun");
 		
 		parameters.add("-sdk");
-		parameters.add(DEFAULT_SDK);
+		parameters.add(sdk);
 		parameters.add("PackageApplication");
 		parameters.add("-v");
 		parameters.add(appDir + appName + ".app");
 		parameters.add("-o");
 		parameters.add(appDir + project.getBuild().getFinalName() + ".ipa");
 		
-		if (buildSettings.get("codeSignIdentity") != null) {
+		if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
 			parameters.add("--sign");
-			parameters.add(buildSettings.get("codeSignIdentity"));
+			parameters.add(codeSignIdentity);
 		}
 		
 		return parameters;
