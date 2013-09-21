@@ -183,7 +183,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
 	protected MultipartEntity createHockeyAppMultipartEntity() throws IOSException {
 		MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		
-		File ipaFile = new File(appDir + appName + ".ipa");
+		File ipaFile = new File(appDir + project.getBuild().getFinalName() + ".ipa");
 		File dsymZipFile = new File(appDir + appName + ".dSYM.zip");
 		
 		entity.addPart("ipa", new FileBody(ipaFile, "application/zip"));
