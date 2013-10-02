@@ -211,6 +211,7 @@ public class IOSCleanMojo extends IOSAbstractMojo {
         }
 
         parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
+        parameters.add("SHARED_PRECOMPS_DIR=" + project.getBuild().getDirectory() + File.separator + DEFAULT_SHARED_PRECOMPS_DIR);
 
         return parameters;
 	}
