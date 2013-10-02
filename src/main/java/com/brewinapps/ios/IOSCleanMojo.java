@@ -28,6 +28,41 @@ public class IOSCleanMojo extends IOSAbstractMojo {
 	private String sourceDir;
 
     /**
+     * iOS project name
+     * @parameter
+     * 		expression="${ios.projectName}"
+     */
+    private String projectName;
+
+    /**
+     * iOS workspace name
+     * @parameter
+     * 		expression="${ios.workspaceName}"
+     */
+    private String workspaceName;
+
+    /**
+     * iOS scheme
+     * @parameter
+     * 		expression="${ios.scheme}"
+     */
+    private String scheme;
+
+    /**
+     * iOS scheme
+     * @parameter
+     * 		expression="${ios.target}"
+     */
+    private String target;
+
+    /**
+     * iOS sdk
+     * @parameter
+     * 		expression="${ios.sdk}"
+     */
+    private String sdk;
+
+    /**
      * iOS build configuration
      * @parameter
      * 		expression="${ios.buildConfiguration}"
@@ -77,6 +112,10 @@ public class IOSCleanMojo extends IOSAbstractMojo {
 		baseDir = project.getBasedir().toString();
 		targetDir = new File(project.getBuild().getDirectory());
 		workDir = new File(baseDir + File.separator + sourceDir);
+
+        if (null == sdk) {
+            sdk = DEFAULT_SDK;
+        }
 	}
 
 	void clean() throws IOSException, IOException {
@@ -134,12 +173,44 @@ public class IOSCleanMojo extends IOSAbstractMojo {
 		List<String> parameters = new ArrayList<String>();
 		parameters.add("xcodebuild");
         parameters.add("clean");
-        parameters.add("-alltargets");
+
+        if (workspaceName != null) {
+            String workspaceSuffix = ".xcworkspace";
+            if (!workspaceName.endsWith(workspaceSuffix)) {
+                workspaceName += workspaceSuffix;
+            }
+
+            parameters.add("-workspace");
+            parameters.add(workspaceName);
+        }
+        else if (projectName != null) {
+            String projectSuffix = ".xcodeproj";
+            if (!projectName.endsWith(projectSuffix)) {
+                projectName += projectSuffix;
+            }
+
+            parameters.add("-project");
+            parameters.add(projectName);
+        }
+
+        if (scheme != null) {
+            parameters.add("-scheme");
+            parameters.add(scheme);
+        }
+        else if (null != target) {
+            parameters.add("-target");
+            parameters.add(target);
+        }
+
+        parameters.add("-sdk");
+        parameters.add(sdk);
 
         if (null != buildConfiguration) {
             parameters.add("-configuration");
             parameters.add(buildConfiguration);
         }
+
+        parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
 
         return parameters;
 	}
