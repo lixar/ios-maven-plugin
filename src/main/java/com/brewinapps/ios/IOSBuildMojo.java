@@ -279,6 +279,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
             parameters.add("CODE_SIGN_IDENTITY=" + codeSignIdentity);
         }
 		parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
+        parameters.add("SHARED_PRECOMPS_DIR=" + project.getBuild().getDirectory() + File.separator + DEFAULT_SHARED_PRECOMPS_DIR);
 		
 		return parameters;
 	}
