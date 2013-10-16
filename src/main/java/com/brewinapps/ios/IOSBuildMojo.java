@@ -227,7 +227,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 
     protected List<String> createXcodebuildParameters() {
         List<String> parameters = new ArrayList<String>();
-        parameters.add("xcodebuild");
+        parameters.add(getBuildCommand());
 
         if (workspaceName != null) {
             String workspaceSuffix = ".xcworkspace";

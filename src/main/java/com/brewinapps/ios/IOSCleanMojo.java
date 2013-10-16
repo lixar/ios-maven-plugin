@@ -159,8 +159,7 @@ public class IOSCleanMojo extends IOSAbstractMojo {
 
     protected List<String> createXcodebuildCleanParameters() {
         List<String> parameters = new ArrayList<String>();
-        parameters.add("xcodebuild");
-        parameters.add("clean");
+        parameters.add(getBuildCommand());
 
         if (workspaceName != null) {
             String workspaceSuffix = ".xcworkspace";
@@ -198,6 +197,8 @@ public class IOSCleanMojo extends IOSAbstractMojo {
 
         parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
         parameters.add("SHARED_PRECOMPS_DIR=" + project.getBuild().getDirectory() + File.separator + DEFAULT_SHARED_PRECOMPS_DIR);
+
+        parameters.add("clean");
 
         return parameters;
     }
