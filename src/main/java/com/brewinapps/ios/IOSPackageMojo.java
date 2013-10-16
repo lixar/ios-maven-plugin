@@ -8,81 +8,80 @@ import org.apache.maven.project.MavenProject;
 
 
 /**
- * 
  * @author Brewin' Apps AS
  * @goal package
  * @phase package
  */
 public class IOSPackageMojo extends IOSAbstractMojo {
-	
-	/**
-	 * iOS app name
-	 * @parameter
-	 * 		expression="${ios.appName}"
-	 * @required
-	 */
-	private String appName;
+
+    /**
+     * iOS app name
+     *
+     * @parameter expression="${ios.appName}"
+     * @required
+     */
+    private String appName;
 
     /**
      * iOS build configuration
-     * @parameter
-     * 		expression="${ios.buildConfiguration}"
+     *
+     * @parameter expression="${ios.buildConfiguration}"
      */
     private String buildConfiguration;
-	
-	/**
-	* The maven project.
-	* 
-	* @parameter expression="${project}"
-	* @required
-	* @readonly
-	*/
-	protected MavenProject project;
-	
-	private String appDir;
-	private String targetDir;
-	
-	
-	/**
-	 * 
-	 */
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			initialize();
-			validateParameters();
-			
-			final String packageName = project.getBuild().getFinalName() + ".zip";
-			packageApp(packageName);
-			
-			project.getArtifact().setFile(new File(appDir + File.separator + packageName));
-		} catch (IOSException e) {
-			getLog().error(e.getMessage());
-			throw new MojoExecutionException(e.getMessage(), e);
-		} catch (Exception e) {
-			getLog().error(e.getMessage());
-			throw new MojoFailureException(e.getMessage());
-		}
-	}
-	
-	void initialize() {
-		targetDir = project.getBuild().getDirectory();
-		appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
-	}
-	
-	protected void validateParameters() throws IOSException {
-		if (null == buildConfiguration) {
+
+    /**
+     * The maven project.
+     *
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    protected MavenProject project;
+
+    private String appDir;
+    private String targetDir;
+
+
+    /**
+     *
+     */
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            initialize();
+            validateParameters();
+
+            final String packageName = project.getBuild().getFinalName() + ".zip";
+            packageApp(packageName);
+
+            project.getArtifact().setFile(new File(appDir + File.separator + packageName));
+        } catch (IOSException e) {
+            getLog().error(e.getMessage());
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (Exception e) {
+            getLog().error(e.getMessage());
+            throw new MojoFailureException(e.getMessage());
+        }
+    }
+
+    void initialize() {
+        targetDir = project.getBuild().getDirectory();
+        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
+    }
+
+    protected void validateParameters() throws IOSException {
+        if (null == buildConfiguration) {
             buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
-		}
-	}
-	
-	protected void packageApp(String packageName) throws IOSException {
-		ProcessBuilder pb = new ProcessBuilder(
-				"zip",
-				"-r", 
-				packageName, 
-				appName + ".app.dSYM",
-				project.getBuild().getFinalName() + ".ipa");
-		pb.directory(new File(appDir));
-		executeCommand(pb);
-	}
+        }
+    }
+
+    protected void packageApp(String packageName) throws IOSException {
+        ProcessBuilder pb = new ProcessBuilder(
+                "zip",
+                "-r",
+                packageName,
+                appName + ".app.dSYM",
+                project.getBuild().getFinalName() + ".ipa");
+        pb.directory(new File(appDir));
+        executeCommand(pb);
+    }
 }

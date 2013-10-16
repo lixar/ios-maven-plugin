@@ -7,60 +7,59 @@ import java.io.InputStreamReader;
 import org.apache.maven.plugin.logging.Log;
 
 /**
- * 
  * @author Brewin' Apps AS
  */
 public class CommandHelper {
 
-	/**
-	 * @param pb
-	 * @throws IOSException
-	 */
-	public static String performCommand(final ProcessBuilder pb, Log logger) throws IOSException {
-		pb.redirectErrorStream(true);
-		
-		StringBuilder joinedCommand = new StringBuilder();
-		for (String segment : pb.command()) {
-			joinedCommand.append(segment).append(" ");
-		}
-		logger.info("Executing '" + joinedCommand.toString().trim() + "'");
-		
-		Process p;
-		try {
-			p = pb.start();
-		} catch (IOException e) {
-			throw new IOSException(e);
-		}
-		
-		BufferedReader input = new BufferedReader(
-				new InputStreamReader(p.getInputStream()));
-		
-		int rc;
-		String returnValue;
-		try {
-			// Display output
-			String outLine;
-			StringBuilder sb = new StringBuilder();
-			while ((outLine = input.readLine()) != null) {
-				sb.append(outLine);
-				logger.debug(outLine);
-			}
-			returnValue = sb.toString();
-			input.close();
-		} catch (IOException e) {
-			throw new IOSException("An error occurred while reading the input stream");
-		}
-		
-		try {
-			rc = p.waitFor();
-		} catch (InterruptedException e) {
-			throw new IOSException(e);
-		}
-		
-		if (rc != 0) {
-			throw new IOSException("The command was unsuccessful");
-		}
-		
-		return returnValue;
-	}
+    /**
+     * @param pb
+     * @throws IOSException
+     */
+    public static String performCommand(final ProcessBuilder pb, Log logger) throws IOSException {
+        pb.redirectErrorStream(true);
+
+        StringBuilder joinedCommand = new StringBuilder();
+        for (String segment : pb.command()) {
+            joinedCommand.append(segment).append(" ");
+        }
+        logger.info("Executing '" + joinedCommand.toString().trim() + "'");
+
+        Process p;
+        try {
+            p = pb.start();
+        } catch (IOException e) {
+            throw new IOSException(e);
+        }
+
+        BufferedReader input = new BufferedReader(
+                new InputStreamReader(p.getInputStream()));
+
+        int rc;
+        String returnValue;
+        try {
+            // Display output
+            String outLine;
+            StringBuilder sb = new StringBuilder();
+            while ((outLine = input.readLine()) != null) {
+                sb.append(outLine);
+                logger.debug(outLine);
+            }
+            returnValue = sb.toString();
+            input.close();
+        } catch (IOException e) {
+            throw new IOSException("An error occurred while reading the input stream");
+        }
+
+        try {
+            rc = p.waitFor();
+        } catch (InterruptedException e) {
+            throw new IOSException(e);
+        }
+
+        if (rc != 0) {
+            throw new IOSException("The command was unsuccessful");
+        }
+
+        return returnValue;
+    }
 }
