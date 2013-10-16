@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 
 
 /**
@@ -104,15 +103,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
      */
     private Map<String, String> keychainParams;
 
-    /**
-     * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
-
     private String baseDir;
     private File targetDir;
     private File workDir;
@@ -138,7 +128,10 @@ public class IOSBuildMojo extends IOSAbstractMojo {
         }
     }
 
-    void initialize() {
+    @Override
+    protected void initialize() {
+        super.initialize();
+
         if (null == buildConfiguration) {
             buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
         }

@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 
 
 /**
@@ -44,15 +43,6 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
      */
     private boolean incrementBuildNumber;
 
-    /**
-     * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
-
     private File workDir;
 
 
@@ -70,7 +60,10 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
         }
     }
 
+    @Override
     protected void initialize() {
+        super.initialize();
+
         String baseDir = project.getBasedir().toString();
         workDir = new File(baseDir + File.separator + sourceDir);
 

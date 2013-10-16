@@ -2,7 +2,6 @@ package com.brewinapps.ios;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -76,15 +75,6 @@ public class IOSCleanMojo extends IOSAbstractMojo {
      */
     private boolean cleanPods;
 
-    /**
-     * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
-
     private String baseDir;
     private File targetDir;
     private File workDir;
@@ -107,7 +97,10 @@ public class IOSCleanMojo extends IOSAbstractMojo {
         }
     }
 
-    void initialize() {
+    @Override
+    protected void initialize() {
+        super.initialize();
+
         baseDir = project.getBasedir().toString();
         targetDir = new File(project.getBuild().getDirectory());
         workDir = new File(baseDir + File.separator + sourceDir);

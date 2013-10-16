@@ -22,7 +22,6 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 
 
 /**
@@ -54,15 +53,6 @@ public class IOSDeployMojo extends IOSAbstractMojo {
      */
     private String buildConfiguration;
 
-    /**
-     * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
-
     private String targetDir;
     private String appDir;
 
@@ -86,7 +76,10 @@ public class IOSDeployMojo extends IOSAbstractMojo {
         }
     }
 
-    void initialize() {
+    @Override
+    protected void initialize() {
+        super.initialize();
+
         targetDir = project.getBuild().getDirectory();
         appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
     }

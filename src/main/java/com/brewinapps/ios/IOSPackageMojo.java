@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 
 
 /**
@@ -28,15 +27,6 @@ public class IOSPackageMojo extends IOSAbstractMojo {
      * @parameter expression="${ios.buildConfiguration}"
      */
     private String buildConfiguration;
-
-    /**
-     * The maven project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
 
     private String appDir;
     private String targetDir;
@@ -63,7 +53,10 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         }
     }
 
-    void initialize() {
+    @Override
+    protected void initialize() {
+        super.initialize();
+
         targetDir = project.getBuild().getDirectory();
         appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
     }
