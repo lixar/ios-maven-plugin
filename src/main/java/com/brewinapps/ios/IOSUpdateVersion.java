@@ -15,31 +15,31 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
     /**
      * iOS Source Directory
      *
-     * @parameter expression="${ios.sourceDir}"
-     * default-value="."
+     * @parameter property="ios.sourceDir"
+     *            default-value="."
      */
     private String sourceDir;
 
     /**
      * iOS version
      *
-     * @parameter expression="${ios.version}"
-     * default-value="${project.version}"
+     * @parameter property="ios.version"
+     *            default-value="project.version"
      */
     private String version;
 
     /**
      * Build number
      *
-     * @parameter expression="${ios.buildNumber}"
+     * @parameter property="ios.buildNumber"
      */
     private String buildNumber;
 
     /**
      * If the build number should be incremented
      *
-     * @parameter expression="${ios.incrementBuildNumber}"
-     * default-value=false
+     * @parameter property="ios.incrementBuildNumber"
+     *            default-value=false
      */
     private boolean incrementBuildNumber;
 

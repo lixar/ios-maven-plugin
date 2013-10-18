@@ -33,7 +33,7 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
      * xctool is expected to be found at /usr/local/bin/xctool
      *
      * @parameter
-     * 		expression="${ios.useXctool}"
+     * 		property="ios.useXctool"
      * 		default-value="true"
      */
     protected boolean useXctool;
