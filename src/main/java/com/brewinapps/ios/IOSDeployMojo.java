@@ -34,14 +34,14 @@ public class IOSDeployMojo extends IOSAbstractMojo {
     /**
      * HockeyApp Configuration
      *
-     * @parameter expression="${ios.hockeyApp}"
+     * @parameter property="ios.hockeyApp"
      */
     private Map<String, String> hockeyApp;
 
     /**
      * iOS App name
      *
-     * @parameter expression="${ios.appName}"
+     * @parameter property="ios.appName"
      * @required
      */
     private String appName;
@@ -49,7 +49,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
     /**
      * iOS build configuration
      *
-     * @parameter expression="${ios.buildConfiguration}"
+     * @parameter property="ios.buildConfiguration"
      */
     private String buildConfiguration;
 

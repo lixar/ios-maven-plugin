@@ -21,15 +21,15 @@ public class IOSBuildMojo extends IOSAbstractMojo {
     /**
      * iOS Source Directory
      *
-     * @parameter expression="${ios.sourceDir}"
-     * default-value="."
+     * @parameter property="ios.sourceDir"
+     *            default-value="."
      */
     private String sourceDir;
 
     /**
      * iOS app name
      *
-     * @parameter expression="${ios.appName}"
+     * @parameter property="ios.appName"
      * @required
      */
     private String appName;
@@ -37,57 +37,57 @@ public class IOSBuildMojo extends IOSAbstractMojo {
     /**
      * If the install/update of the pods should be skipped (assuming the project uses CocoaPods)
      *
-     * @parameter expression="${ios.skipPodsUpdate}"
-     * default-value="false"
+     * @parameter property="ios.skipPodsUpdate"
+     *            default-value="false"
      */
     private boolean skipPodsUpdate;
 
     /**
      * iOS project name
      *
-     * @parameter expression="${ios.projectName}"
+     * @parameter property="ios.projectName"
      */
     private String projectName;
 
     /**
      * iOS workspace name
      *
-     * @parameter expression="${ios.workspaceName}"
+     * @parameter property="ios.workspaceName"
      */
     private String workspaceName;
 
     /**
      * iOS scheme
      *
-     * @parameter expression="${ios.scheme}"
+     * @parameter property="ios.scheme"
      */
     private String scheme;
 
     /**
      * iOS scheme
      *
-     * @parameter expression="${ios.target}"
+     * @parameter property="ios.target"
      */
     private String target;
 
     /**
      * iOS sdk
      *
-     * @parameter expression="${ios.sdk}"
+     * @parameter property="ios.sdk"
      */
     private String sdk;
 
     /**
      * iOS build configuration
      *
-     * @parameter expression="${ios.buildConfiguration}"
+     * @parameter property="ios.buildConfiguration"
      */
     private String buildConfiguration;
 
     /**
      * iOS code sign identity
      *
-     * @parameter expression="${ios.codeSignIdentity}"
+     * @parameter property="ios.codeSignIdentity"
      */
     private String codeSignIdentity;
 

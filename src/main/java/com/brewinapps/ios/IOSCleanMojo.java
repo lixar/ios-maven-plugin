@@ -20,58 +20,58 @@ public class IOSCleanMojo extends IOSAbstractMojo {
     /**
      * iOS Source Directory
      *
-     * @parameter expression="${ios.sourceDir}"
-     * default-value="."
+     * @parameter property="ios.sourceDir"
+     *            default-value="."
      */
     private String sourceDir;
 
     /**
      * iOS project name
      *
-     * @parameter expression="${ios.projectName}"
+     * @parameter property="ios.projectName"
      */
     private String projectName;
 
     /**
      * iOS workspace name
      *
-     * @parameter expression="${ios.workspaceName}"
+     * @parameter property="ios.workspaceName"
      */
     private String workspaceName;
 
     /**
      * iOS scheme
      *
-     * @parameter expression="${ios.scheme}"
+     * @parameter property="ios.scheme"
      */
     private String scheme;
 
     /**
      * iOS scheme
      *
-     * @parameter expression="${ios.target}"
+     * @parameter property="ios.target"
      */
     private String target;
 
     /**
      * iOS sdk
      *
-     * @parameter expression="${ios.sdk}"
+     * @parameter property="ios.sdk"
      */
     private String sdk;
 
     /**
      * iOS build configuration
      *
-     * @parameter expression="${ios.buildConfiguration}"
+     * @parameter property="ios.buildConfiguration"
      */
     private String buildConfiguration;
 
     /**
      * If the Pods folder and Podfile.lock file should be deleted during the clean
      *
-     * @parameter expression="${ios.cleanPods}"
-     * default-value="true"
+     * @parameter property="ios.cleanPods"
+     *            default-value="true"
      */
     private boolean cleanPods;
 

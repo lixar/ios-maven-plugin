@@ -16,7 +16,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
     /**
      * iOS app name
      *
-     * @parameter expression="${ios.appName}"
+     * @parameter property="ios.appName"
      * @required
      */
     private String appName;
@@ -24,7 +24,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
     /**
      * iOS build configuration
      *
-     * @parameter expression="${ios.buildConfiguration}"
+     * @parameter property="ios.buildConfiguration"
      */
     private String buildConfiguration;
 
