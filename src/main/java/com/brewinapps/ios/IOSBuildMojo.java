@@ -1,12 +1,14 @@
 package com.brewinapps.ios;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.util.FileUtils;
 
 
 /**
@@ -119,6 +121,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
             validateParameters();
             unlockKeychain();
             build();
+            renameFiles();
         } catch (IOSException e) {
             getLog().error(e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);
@@ -223,6 +226,16 @@ public class IOSBuildMojo extends IOSAbstractMojo {
         ProcessBuilder pb = new ProcessBuilder(parameters);
         pb.directory(workDir);
         executeCommand(pb);
+    }
+
+    protected void renameFiles() throws IOException {
+        String dSYMFilePath = appDir + appName + ".app.dSYM";
+        if (FileUtils.fileExists(dSYMFilePath)) {
+            String dSYMNewFilePath= appDir + project.getBuild().getFinalName() + ".app.dSYM";
+            File dSYMFile = new File(dSYMFilePath);
+            File dSYMNewFile = new File(dSYMNewFilePath);
+            FileUtils.rename(dSYMFile, dSYMNewFile);
+        }
     }
 
     protected List<String> createXcodebuildParameters() {
