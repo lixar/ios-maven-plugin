@@ -72,7 +72,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
                 "zip",
                 "-r",
                 packageName,
-                appName + ".app.dSYM",
+                project.getBuild().getFinalName() + ".app.dSYM",
                 project.getBuild().getFinalName() + ".ipa");
         pb.directory(new File(appDir));
         executeCommand(pb);
