@@ -234,6 +234,9 @@ public class IOSBuildMojo extends IOSAbstractMojo {
             String dSYMNewFilePath= appDir + project.getBuild().getFinalName() + ".app.dSYM";
             File dSYMFile = new File(dSYMFilePath);
             File dSYMNewFile = new File(dSYMNewFilePath);
+
+            getLog().debug("Renaming " + dSYMFilePath + " to " + dSYMNewFilePath);
+            FileUtils.deleteDirectory(dSYMNewFile);
             FileUtils.rename(dSYMFile, dSYMNewFile);
         }
     }
