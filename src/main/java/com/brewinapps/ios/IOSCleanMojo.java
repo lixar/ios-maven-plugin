@@ -16,57 +16,6 @@ import java.util.List;
  * @phase clean
  */
 public class IOSCleanMojo extends IOSAbstractMojo {
-
-    /**
-     * iOS Source Directory
-     *
-     * @parameter property="ios.sourceDir"
-     *            default-value="."
-     */
-    private String sourceDir;
-
-    /**
-     * iOS project name
-     *
-     * @parameter property="ios.projectName"
-     */
-    private String projectName;
-
-    /**
-     * iOS workspace name
-     *
-     * @parameter property="ios.workspaceName"
-     */
-    private String workspaceName;
-
-    /**
-     * iOS scheme
-     *
-     * @parameter property="ios.scheme"
-     */
-    private String scheme;
-
-    /**
-     * iOS scheme
-     *
-     * @parameter property="ios.target"
-     */
-    private String target;
-
-    /**
-     * iOS sdk
-     *
-     * @parameter property="ios.sdk"
-     */
-    private String sdk;
-
-    /**
-     * iOS build configuration
-     *
-     * @parameter property="ios.buildConfiguration"
-     */
-    private String buildConfiguration;
-
     /**
      * If the Pods folder and Podfile.lock file should be deleted during the clean
      *
@@ -74,11 +23,6 @@ public class IOSCleanMojo extends IOSAbstractMojo {
      *            default-value="true"
      */
     private boolean cleanPods;
-
-    private String baseDir;
-    private File targetDir;
-    private File workDir;
-
 
     /**
      *
@@ -94,19 +38,6 @@ public class IOSCleanMojo extends IOSAbstractMojo {
         } catch (Exception e) {
             getLog().error(e.getMessage());
             throw new MojoFailureException(e.getMessage());
-        }
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        baseDir = project.getBasedir().toString();
-        targetDir = new File(project.getBuild().getDirectory());
-        workDir = new File(baseDir + File.separator + sourceDir);
-
-        if (null == sdk) {
-            sdk = DEFAULT_SDK;
         }
     }
 

@@ -17,70 +17,12 @@ import org.apache.maven.plugin.MojoFailureException;
 public class IOSBuildMojo extends IOSAbstractMojo {
 
     /**
-     * iOS Source Directory
-     *
-     * @parameter property="ios.sourceDir"
-     *            default-value="."
-     */
-    private String sourceDir;
-
-    /**
-     * iOS app name
-     *
-     * @parameter property="ios.appName"
-     * @required
-     */
-    private String appName;
-
-    /**
      * If the install/update of the pods should be skipped (assuming the project uses CocoaPods)
      *
      * @parameter property="ios.skipPodsUpdate"
      *            default-value="false"
      */
     private boolean skipPodsUpdate;
-
-    /**
-     * iOS project name
-     *
-     * @parameter property="ios.projectName"
-     */
-    private String projectName;
-
-    /**
-     * iOS workspace name
-     *
-     * @parameter property="ios.workspaceName"
-     */
-    private String workspaceName;
-
-    /**
-     * iOS scheme
-     *
-     * @parameter property="ios.scheme"
-     */
-    private String scheme;
-
-    /**
-     * iOS scheme
-     *
-     * @parameter property="ios.target"
-     */
-    private String target;
-
-    /**
-     * iOS sdk
-     *
-     * @parameter property="ios.sdk"
-     */
-    private String sdk;
-
-    /**
-     * iOS build configuration
-     *
-     * @parameter property="ios.buildConfiguration"
-     */
-    private String buildConfiguration;
 
     /**
      * iOS code sign identity
@@ -103,11 +45,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
      */
     private Map<String, String> keychainParams;
 
-    private String baseDir;
-    private File targetDir;
-    private File workDir;
-    private String appDir;
-
 
     /**
      *
@@ -126,24 +63,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
             getLog().error(e.getMessage());
             throw new MojoFailureException(e.getMessage());
         }
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        if (null == buildConfiguration) {
-            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
-        }
-
-        if (null == sdk) {
-            sdk = DEFAULT_SDK;
-        }
-
-        baseDir = project.getBasedir().toString();
-        targetDir = new File(project.getBuild().getDirectory());
-        workDir = new File(baseDir + File.separator + sourceDir);
-        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
     }
 
     boolean hasPodfile() {

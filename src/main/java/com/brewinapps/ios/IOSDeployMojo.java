@@ -38,24 +38,6 @@ public class IOSDeployMojo extends IOSAbstractMojo {
      */
     private Map<String, String> hockeyApp;
 
-    /**
-     * iOS App name
-     *
-     * @parameter property="ios.appName"
-     * @required
-     */
-    private String appName;
-
-    /**
-     * iOS build configuration
-     *
-     * @parameter property="ios.buildConfiguration"
-     */
-    private String buildConfiguration;
-
-    private String targetDir;
-    private String appDir;
-
     static final String HOCKEYAPP_UPLOAD_URL = "https://rink.hockeyapp.net/api/2/apps/%s/app_versions";
 
     /**
@@ -76,19 +58,10 @@ public class IOSDeployMojo extends IOSAbstractMojo {
         }
     }
 
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        targetDir = project.getBuild().getDirectory();
-        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
-    }
-
     protected void deploy() throws IOSException {
         getLog().info("Deploying to HockeyApp...");
 
         try {
-            prepareDSYMPackage();
             uploadToHockeyApp();
 
         } catch (Exception e) {
@@ -104,24 +77,10 @@ public class IOSDeployMojo extends IOSAbstractMojo {
             throw new IOSException("The 'hockeyAppIdentifier' parameter is required to upload to Hockey App");
         }
 
-        if (null == buildConfiguration) {
-            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
-        }
-
-        String ipaPath = appDir + project.getBuild().getFinalName() + ".ipa";
+        final String ipaPath = appDir + project.getBuild().getFinalName() + ".ipa";
         if (!(new File(ipaPath)).exists()) {
             throw new IOSException("Could not find ipa file at '" + ipaPath + "'. You must compile the artifact before deploying.");
         }
-    }
-
-    protected void prepareDSYMPackage() throws IOSException {
-        ProcessBuilder pb = new ProcessBuilder(
-                "zip",
-                "-r",
-                appName + ".dSYM.zip",
-                appName + ".app.dSYM");
-        pb.directory(new File(appDir));
-        executeCommand(pb);
     }
 
     protected void uploadToHockeyApp() throws IOSException {
@@ -175,8 +134,8 @@ public class IOSDeployMojo extends IOSAbstractMojo {
     protected MultipartEntity createHockeyAppMultipartEntity() throws IOSException {
         MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 
-        File ipaFile = new File(appDir + project.getBuild().getFinalName() + ".ipa");
-        File dsymZipFile = new File(appDir + appName + ".dSYM.zip");
+        File ipaFile = new File(getArtifactPath("ipa"));
+        File dsymZipFile = new File(getArtifactPath("dSYM.zip"));
 
         entity.addPart("ipa", new FileBody(ipaFile, "application/zip"));
         entity.addPart("dsym", new FileBody(dsymZipFile, "application/zip"));

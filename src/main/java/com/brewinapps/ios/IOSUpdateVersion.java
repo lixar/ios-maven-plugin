@@ -1,7 +1,5 @@
 package com.brewinapps.ios;
 
-import java.io.File;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -11,14 +9,6 @@ import org.apache.maven.plugin.MojoFailureException;
  * @goal update-version
  */
 public class IOSUpdateVersion extends IOSAbstractMojo {
-
-    /**
-     * iOS Source Directory
-     *
-     * @parameter property="ios.sourceDir"
-     *            default-value="."
-     */
-    private String sourceDir;
 
     /**
      * iOS version
@@ -43,8 +33,6 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
      */
     private boolean incrementBuildNumber;
 
-    private File workDir;
-
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -63,9 +51,6 @@ public class IOSUpdateVersion extends IOSAbstractMojo {
     @Override
     protected void initialize() {
         super.initialize();
-
-        String baseDir = project.getBasedir().toString();
-        workDir = new File(baseDir + File.separator + sourceDir);
 
         if (null == version || 0 == version.length()) {
             version = project.getVersion();

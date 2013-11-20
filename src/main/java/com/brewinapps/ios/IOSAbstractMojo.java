@@ -28,6 +28,81 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
+     * Absolute path to the base directory.
+     */
+    protected String baseDir;
+    /**
+     * Absolute path to the target directory where artifacts are built.
+     */
+    protected File targetDir;
+    /**
+     * Absolute path to the working directory.
+     */
+    protected File workDir;
+    /**
+     * Absolute path to the built .app file.
+     */
+    protected String appDir;
+
+    /**
+     * iOS Source Directory
+     *
+     * @parameter property="ios.sourceDir"
+     *            default-value="."
+     */
+    protected String sourceDir;
+
+    /**
+     * iOS app name
+     *
+     * @parameter property="ios.appName"
+     * @required
+     */
+    protected String appName;
+
+    /**
+     * iOS project name
+     *
+     * @parameter property="ios.projectName"
+     */
+    protected String projectName;
+
+    /**
+     * iOS workspace name
+     *
+     * @parameter property="ios.workspaceName"
+     */
+    protected String workspaceName;
+
+    /**
+     * iOS scheme
+     *
+     * @parameter property="ios.scheme"
+     */
+    protected String scheme;
+
+    /**
+     * iOS scheme
+     *
+     * @parameter property="ios.target"
+     */
+    protected String target;
+
+    /**
+     * iOS sdk
+     *
+     * @parameter property="ios.sdk"
+     */
+    protected String sdk;
+
+    /**
+     * iOS build configuration
+     *
+     * @parameter property="ios.buildConfiguration"
+     */
+    protected String buildConfiguration;
+
+    /**
      * If xctool should be used in lieu of xcodebuild when available on the system
      * See https://github.com/facebook/xctool
      * xctool is expected to be found at /usr/local/bin/xctool
@@ -43,11 +118,26 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
     }
 
     protected void initialize() {
+        loadDefaults();
+
+        baseDir = project.getBasedir().toString();
+        targetDir = new File(project.getBuild().getDirectory());
+        workDir = new File(baseDir + File.separator + sourceDir);
+        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
+
+        getLog().debug("Using '" + getBuildCommand() + "' command for building");
+    }
+
+    private void loadDefaults() {
+        if (null == buildConfiguration) {
+            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
+        }
+        if (null == sdk) {
+            sdk = DEFAULT_SDK;
+        }
         if (useXctool) {
             useXctool = xctoolExists();
         }
-
-        getLog().debug("Using '" + getBuildCommand() + "' command for building");
     }
 
     private String getXctoolPath() {
@@ -76,5 +166,12 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
 
     protected String getBuildCommand() {
         return useXctool ? "xctool" : "xcodebuild";
+    }
+
+    protected String getArtifactPath(String extension) {
+        if (null == extension) {
+            extension = "";
+        }
+        return appDir + File.separator + project.getBuild().getFinalName() + "." + extension;
     }
 }
