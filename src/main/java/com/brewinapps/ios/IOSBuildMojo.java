@@ -87,7 +87,7 @@ public class IOSBuildMojo extends IOSAbstractMojo {
     }
 
     protected void build() throws IOSException {
-        if (!skipPodsUpdate && hasPodfile()) {
+        if ((!skipPodsUpdate || !hasPodfileLock()) && hasPodfile()) {
             updatePods();
         }
 
