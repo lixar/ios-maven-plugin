@@ -170,10 +170,14 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
         return useXctool ? "xctool" : "xcodebuild";
     }
 
-    protected String getArtifactPath(String extension) {
+    protected String getArtifactFilename(String extension) {
         if (null == extension) {
             extension = "";
         }
-        return appDir + File.separator + project.getBuild().getFinalName() + "." + extension;
+        return project.getBuild().getFinalName() + "." + extension;
+    }
+
+    protected String getArtifactPath(String extension) {
+        return appDir + File.separator + getArtifactFilename(extension);
     }
 }
