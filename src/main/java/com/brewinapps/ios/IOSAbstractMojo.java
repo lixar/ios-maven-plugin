@@ -122,7 +122,7 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
         baseDir = project.getBasedir().toString();
         targetDir = new File(project.getBuild().getDirectory());
         workDir = new File(baseDir + File.separator + sourceDir);
-        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
+        appDir = targetDir + File.separator + buildConfiguration + "-" + sdk + File.separator;
 
         getLog().debug("Using '" + getBuildCommand() + "' command for building");
     }
