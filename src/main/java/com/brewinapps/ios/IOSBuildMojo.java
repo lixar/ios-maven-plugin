@@ -1,14 +1,12 @@
 package com.brewinapps.ios;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.plexus.util.FileUtils;
 
 
 /**
@@ -19,70 +17,12 @@ import org.codehaus.plexus.util.FileUtils;
 public class IOSBuildMojo extends IOSAbstractMojo {
 
     /**
-     * iOS Source Directory
-     *
-     * @parameter property="ios.sourceDir"
-     *            default-value="."
-     */
-    private String sourceDir;
-
-    /**
-     * iOS app name
-     *
-     * @parameter property="ios.appName"
-     * @required
-     */
-    private String appName;
-
-    /**
      * If the install/update of the pods should be skipped (assuming the project uses CocoaPods)
      *
      * @parameter property="ios.skipPodsUpdate"
      *            default-value="false"
      */
     private boolean skipPodsUpdate;
-
-    /**
-     * iOS project name
-     *
-     * @parameter property="ios.projectName"
-     */
-    private String projectName;
-
-    /**
-     * iOS workspace name
-     *
-     * @parameter property="ios.workspaceName"
-     */
-    private String workspaceName;
-
-    /**
-     * iOS scheme
-     *
-     * @parameter property="ios.scheme"
-     */
-    private String scheme;
-
-    /**
-     * iOS scheme
-     *
-     * @parameter property="ios.target"
-     */
-    private String target;
-
-    /**
-     * iOS sdk
-     *
-     * @parameter property="ios.sdk"
-     */
-    private String sdk;
-
-    /**
-     * iOS build configuration
-     *
-     * @parameter property="ios.buildConfiguration"
-     */
-    private String buildConfiguration;
 
     /**
      * iOS code sign identity
@@ -105,11 +45,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
      */
     private Map<String, String> keychainParams;
 
-    private String baseDir;
-    private File targetDir;
-    private File workDir;
-    private String appDir;
-
 
     /**
      *
@@ -121,7 +56,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
             validateParameters();
             unlockKeychain();
             build();
-            renameFiles();
         } catch (IOSException e) {
             getLog().error(e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);
@@ -129,24 +63,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
             getLog().error(e.getMessage());
             throw new MojoFailureException(e.getMessage());
         }
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        if (null == buildConfiguration) {
-            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
-        }
-
-        if (null == sdk) {
-            sdk = DEFAULT_SDK;
-        }
-
-        baseDir = project.getBasedir().toString();
-        targetDir = new File(project.getBuild().getDirectory());
-        workDir = new File(baseDir + File.separator + sourceDir);
-        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
     }
 
     boolean hasPodfile() {
@@ -171,12 +87,11 @@ public class IOSBuildMojo extends IOSAbstractMojo {
     }
 
     protected void build() throws IOSException {
-        if (!skipPodsUpdate && hasPodfile()) {
+        if ((!skipPodsUpdate || !hasPodfileLock()) && hasPodfile()) {
             updatePods();
         }
 
         xcodebuild();
-        xcrun();
     }
 
     protected void updatePods() throws IOSException {
@@ -218,27 +133,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
         ProcessBuilder pb = new ProcessBuilder(parameters);
         pb.directory(workDir);
         executeCommand(pb);
-    }
-
-    protected void xcrun() throws IOSException {
-        List<String> parameters = createXcrunParameters();
-
-        ProcessBuilder pb = new ProcessBuilder(parameters);
-        pb.directory(workDir);
-        executeCommand(pb);
-    }
-
-    protected void renameFiles() throws IOException {
-        String dSYMFilePath = appDir + appName + ".app.dSYM";
-        if (FileUtils.fileExists(dSYMFilePath)) {
-            String dSYMNewFilePath= appDir + project.getBuild().getFinalName() + ".app.dSYM";
-            File dSYMFile = new File(dSYMFilePath);
-            File dSYMNewFile = new File(dSYMNewFilePath);
-
-            getLog().debug("Renaming " + dSYMFilePath + " to " + dSYMNewFilePath);
-            FileUtils.deleteDirectory(dSYMNewFile);
-            FileUtils.rename(dSYMFile, dSYMNewFile);
-        }
     }
 
     protected List<String> createXcodebuildParameters() {
@@ -287,26 +181,6 @@ public class IOSBuildMojo extends IOSAbstractMojo {
         }
         parameters.add("SYMROOT=" + targetDir.getAbsolutePath());
         parameters.add("SHARED_PRECOMPS_DIR=" + project.getBuild().getDirectory() + File.separator + DEFAULT_SHARED_PRECOMPS_DIR);
-
-        return parameters;
-    }
-
-    protected List<String> createXcrunParameters() {
-        List<String> parameters = new ArrayList<String>();
-        parameters.add("xcrun");
-
-        parameters.add("-sdk");
-        parameters.add(sdk);
-        parameters.add("PackageApplication");
-        parameters.add("-v");
-        parameters.add(appDir + appName + ".app");
-        parameters.add("-o");
-        parameters.add(appDir + project.getBuild().getFinalName() + ".ipa");
-
-        if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
-            parameters.add("--sign");
-            parameters.add(codeSignIdentity);
-        }
 
         return parameters;
     }

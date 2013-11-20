@@ -1,6 +1,8 @@
 package com.brewinapps.ios;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -12,25 +14,12 @@ import org.apache.maven.plugin.MojoFailureException;
  * @phase package
  */
 public class IOSPackageMojo extends IOSAbstractMojo {
-
     /**
-     * iOS app name
+     * iOS code sign identity
      *
-     * @parameter property="ios.appName"
-     * @required
+     * @parameter property="ios.codeSignIdentity"
      */
-    private String appName;
-
-    /**
-     * iOS build configuration
-     *
-     * @parameter property="ios.buildConfiguration"
-     */
-    private String buildConfiguration;
-
-    private String appDir;
-    private String targetDir;
-
+    private String codeSignIdentity;
 
     /**
      *
@@ -38,12 +27,10 @@ public class IOSPackageMojo extends IOSAbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             initialize();
-            validateParameters();
+            xcrun();
+            packageDsym();
 
-            final String packageName = project.getBuild().getFinalName() + ".zip";
-            packageApp(packageName);
-
-            project.getArtifact().setFile(new File(appDir + File.separator + packageName));
+            project.getArtifact().setFile(new File(getArtifactPath("ipa")));
         } catch (IOSException e) {
             getLog().error(e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);
@@ -53,28 +40,41 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         }
     }
 
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        targetDir = project.getBuild().getDirectory();
-        appDir = targetDir + File.separator + buildConfiguration + "-" + DEFAULT_SDK + File.separator;
-    }
-
-    protected void validateParameters() throws IOSException {
-        if (null == buildConfiguration) {
-            buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
-        }
-    }
-
-    protected void packageApp(String packageName) throws IOSException {
+    protected void packageDsym() throws IOSException {
         ProcessBuilder pb = new ProcessBuilder(
                 "zip",
                 "-r",
-                packageName,
-                project.getBuild().getFinalName() + ".app.dSYM",
-                project.getBuild().getFinalName() + ".ipa");
+                getArtifactPath("dSYM.zip"),
+                appDir + appName + ".app.dSYM");
         pb.directory(new File(appDir));
         executeCommand(pb);
+    }
+
+    protected void xcrun() throws IOSException {
+        List<String> parameters = createXcrunParameters();
+
+        ProcessBuilder pb = new ProcessBuilder(parameters);
+        pb.directory(workDir);
+        executeCommand(pb);
+    }
+
+    protected List<String> createXcrunParameters() {
+        List<String> parameters = new ArrayList<String>();
+        parameters.add("xcrun");
+
+        parameters.add("-sdk");
+        parameters.add(sdk);
+        parameters.add("PackageApplication");
+        parameters.add("-v");
+        parameters.add(appDir + appName + ".app");
+        parameters.add("-o");
+        parameters.add(getArtifactPath("ipa"));
+
+        if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
+            parameters.add("--sign");
+            parameters.add(codeSignIdentity);
+        }
+
+        return parameters;
     }
 }
