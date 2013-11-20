@@ -44,8 +44,8 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         ProcessBuilder pb = new ProcessBuilder(
                 "zip",
                 "-r",
-                getArtifactPath("dSYM.zip"),
-                appDir + appName + ".app.dSYM");
+                getArtifactFilename("dSYM.zip"),
+                appName + ".app.dSYM");
         pb.directory(new File(appDir));
         executeCommand(pb);
     }
@@ -54,7 +54,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         List<String> parameters = createXcrunParameters();
 
         ProcessBuilder pb = new ProcessBuilder(parameters);
-        pb.directory(workDir);
+        pb.directory(new File(appDir));
         executeCommand(pb);
     }
 
@@ -66,7 +66,7 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         parameters.add(sdk);
         parameters.add("PackageApplication");
         parameters.add("-v");
-        parameters.add(appDir + appName + ".app");
+        parameters.add(appName + ".app");
         parameters.add("-o");
         parameters.add(getArtifactPath("ipa"));
 
