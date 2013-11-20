@@ -128,6 +128,9 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
     }
 
     private void loadDefaults() {
+        if (null == sourceDir) {
+            sourceDir = "";
+        }
         if (null == buildConfiguration) {
             buildConfiguration = DEFAULT_BUILD_CONFIGURATION;
         }
