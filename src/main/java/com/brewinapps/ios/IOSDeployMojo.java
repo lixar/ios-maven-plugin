@@ -65,7 +65,7 @@ public class IOSDeployMojo extends IOSAbstractMojo {
             uploadToHockeyApp();
 
         } catch (Exception e) {
-            throw new IOSException("An error occured while deploying build to HockeyApp: " + e.getMessage());
+            throw new IOSException("An error occurred while deploying build to HockeyApp: " + e.getMessage());
         }
     }
 

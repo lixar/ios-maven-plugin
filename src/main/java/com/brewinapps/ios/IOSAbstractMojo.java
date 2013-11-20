@@ -14,9 +14,8 @@ import java.io.File;
 public abstract class IOSAbstractMojo extends AbstractMojo {
 
     static final String DEFAULT_SDK = "iphoneos";
-    static final String DEFAULT_BUILD_CONFIGURATION = "Adhoc";
+    static final String DEFAULT_BUILD_CONFIGURATION = "Release";
     static final String DEFAULT_SHARED_PRECOMPS_DIR = "SharedPrecompiledHeaders";
-    static final String XCTOOL_PATH = "/usr/local/bin/xctool";
 
     /**
      * The project currently being built.
@@ -142,7 +141,7 @@ public abstract class IOSAbstractMojo extends AbstractMojo {
 
     private String getXctoolPath() {
         ProcessBuilder pb = new ProcessBuilder("which", "xctool");
-        String xctoolPath = null;
+        String xctoolPath;
         try {
             xctoolPath = CommandHelper.performCommand(pb, getLog());
         } catch (IOSException e) {
