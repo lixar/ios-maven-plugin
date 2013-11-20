@@ -39,11 +39,10 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         try {
             initialize();
             validateParameters();
+            packageDsym();
 
-            final String packageName = project.getBuild().getFinalName() + ".zip";
-            packageApp(packageName);
-
-            project.getArtifact().setFile(new File(appDir + File.separator + packageName));
+            final String artifactName = project.getBuild().getFinalName() + ".ipa";
+            project.getArtifact().setFile(new File(appDir + File.separator + artifactName));
         } catch (IOSException e) {
             getLog().error(e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);
@@ -67,13 +66,12 @@ public class IOSPackageMojo extends IOSAbstractMojo {
         }
     }
 
-    protected void packageApp(String packageName) throws IOSException {
+    protected void packageDsym() throws IOSException {
         ProcessBuilder pb = new ProcessBuilder(
                 "zip",
                 "-r",
-                packageName,
-                project.getBuild().getFinalName() + ".app.dSYM",
-                project.getBuild().getFinalName() + ".ipa");
+                project.getBuild().getFinalName() + ".dSYM.zip",
+                project.getBuild().getFinalName() + ".app.dSYM");
         pb.directory(new File(appDir));
         executeCommand(pb);
     }
