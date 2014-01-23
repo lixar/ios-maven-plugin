@@ -173,7 +173,9 @@ public class IOSBuildMojo extends IOSAbstractMojo {
 
         if (null != buildSettings) {
             for (Map.Entry<String, String> entry : buildSettings.entrySet()) {
-                parameters.add(entry.getKey() + "=" + entry.getValue());
+                if (null != entry.getValue()) {
+                    parameters.add(entry.getKey() + "=" + entry.getValue());
+                }
             }
         }
         if (codeSignIdentity != null && codeSignIdentity.length() > 0) {
